@@ -1,5 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useEffect } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { useLocaleStore } from "./src/store";
@@ -7,7 +14,24 @@ import { useLocaleStore } from "./src/store";
 export default function App() {
   const { t } = useTranslation("common");
   const locale = useLocaleStore((s) => s.locale);
+  const isInitialLocaleResolved = useLocaleStore(
+    (s) => s.isInitialLocaleResolved,
+  );
+  const resolveInitialLocale = useLocaleStore((s) => s.resolveInitialLocale);
   const setLocale = useLocaleStore((s) => s.setLocale);
+
+  useEffect(() => {
+    void resolveInitialLocale();
+  }, [resolveInitialLocale]);
+
+  if (!isInitialLocaleResolved) {
+    return (
+      <View style={styles.boot}>
+        <ActivityIndicator size="large" />
+        <StatusBar style="auto" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -17,13 +41,13 @@ export default function App() {
       <View style={styles.row}>
         <Pressable
           style={[styles.chip, locale === "en" && styles.chipActive]}
-          onPress={() => setLocale("en")}
+          onPress={() => void setLocale("en")}
         >
           <Text>{t("language.en")}</Text>
         </Pressable>
         <Pressable
           style={[styles.chip, locale === "uk" && styles.chipActive]}
-          onPress={() => setLocale("uk")}
+          onPress={() => void setLocale("uk")}
         >
           <Text>{t("language.uk")}</Text>
         </Pressable>
@@ -35,6 +59,12 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  boot: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",

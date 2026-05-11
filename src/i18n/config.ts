@@ -13,6 +13,10 @@ export const resources = {
 
 export type AppLocale = keyof typeof resources;
 
+export function isAppLocale(value: string): value is AppLocale {
+  return Object.prototype.hasOwnProperty.call(resources, value);
+}
+
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources,
