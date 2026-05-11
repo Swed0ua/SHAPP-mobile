@@ -4,7 +4,14 @@
     "subtitle": "Choose language"
   },
   "language": {
+    "heading": "Language",
     "en": "English",
     "uk": "Ukrainian"
+  },
+  "theme": {
+    "heading": "Appearance",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
   }
 }
