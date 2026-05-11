@@ -1,0 +1,10 @@
+{
+  "app": {
+    "title": "SHAPP",
+    "subtitle": "Choose language"
+  },
+  "language": {
+    "en": "English",
+    "uk": "Ukrainian"
+  }
+}
