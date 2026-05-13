@@ -10,7 +10,7 @@ import type { ThemeMode, ThemePreference } from "../../theme/types";
 
 const THEME_PREFERENCE_STORAGE_KEY = "@shapp_theme_preference";
 
-const DEFAULT_THEME_PREFERENCE: ThemePreference = "auto";
+const DEFAULT_THEME_PREFERENCE: ThemePreference = "dark";
 
 function isThemePreference(value: string): value is ThemePreference {
   return value === "auto" || value === "light" || value === "dark";
