@@ -1,70 +1,15 @@
-import { StatusBar } from "expo-status-bar";
-import { useEffect, useMemo } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-import { useLocaleStore, useThemeStore } from "./src/store";
-import { useTheme } from "./src/theme";
+import { useLocaleStore } from "../store";
+import { useTheme } from "../theme";
+import type { ThemePreference } from "../theme/types";
 
-export default function App() {
+export function LocaleThemeSettingsPanel() {
   const { t } = useTranslation("common");
-  const systemColorScheme = useColorScheme();
-
   const locale = useLocaleStore((s) => s.locale);
-  const isInitialLocaleResolved = useLocaleStore(
-    (s) => s.isInitialLocaleResolved,
-  );
-  const resolveInitialLocale = useLocaleStore((s) => s.resolveInitialLocale);
   const setLocale = useLocaleStore((s) => s.setLocale);
-
-  const isInitialThemeResolved = useThemeStore((s) => s.isInitialThemeResolved);
-  const resolveInitialTheme = useThemeStore((s) => s.resolveInitialTheme);
-  const applySystemAppearance = useThemeStore((s) => s.applySystemAppearance);
-
   const { theme, themePreference, setThemePreference } = useTheme();
-
-  useEffect(() => {
-    void Promise.all([
-      resolveInitialLocale(),
-      resolveInitialTheme(),
-    ]);
-  }, [resolveInitialLocale, resolveInitialTheme]);
-
-  useEffect(() => {
-    applySystemAppearance(systemColorScheme);
-  }, [applySystemAppearance, systemColorScheme]);
-
-  const isAppShellReady = isInitialLocaleResolved && isInitialThemeResolved;
-
-  const containerLayout = useMemo(
-    () => ({
-      flex: 1 as const,
-      alignItems: "center" as const,
-      justifyContent: "center" as const,
-      padding: theme.spacing.xl,
-      backgroundColor: theme.colors.background.canvas,
-    }),
-    [
-      theme.colors.background.canvas,
-      theme.spacing.xl,
-    ],
-  );
-
-  if (!isAppShellReady) {
-    return (
-      <View style={styles.bootPlain}>
-        <ActivityIndicator size="large" color="#52525B" />
-        <StatusBar style="auto" />
-      </View>
-    );
-  }
 
   const chipBase = {
     paddingHorizontal: theme.spacing.lg,
@@ -81,26 +26,7 @@ export default function App() {
   };
 
   return (
-    <View style={containerLayout}>
-      <Text
-        style={{
-          ...theme.typography.headline,
-          color: theme.colors.content.primary,
-          marginBottom: theme.spacing.sm,
-        }}
-      >
-        {t("app.title")}
-      </Text>
-      <Text
-        style={{
-          ...theme.typography.body,
-          color: theme.colors.content.secondary,
-          marginBottom: theme.spacing.xl,
-        }}
-      >
-        {t("app.subtitle")}
-      </Text>
-
+    <View style={styles.block}>
       <Text
         style={{
           ...theme.typography.caption,
@@ -125,7 +51,7 @@ export default function App() {
               chipBase,
               themePreference === value ? chipActive : null,
             ]}
-            onPress={() => void setThemePreference(value)}
+            onPress={() => void setThemePreference(value as ThemePreference)}
           >
             <Text style={{ color: theme.colors.content.primary }}>{label}</Text>
           </Pressable>
@@ -161,18 +87,13 @@ export default function App() {
           </Text>
         </Pressable>
       </View>
-
-      <StatusBar style={theme.mode === "dark" ? "light" : "dark"} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  bootPlain: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#E4E4E7",
+  block: {
+    alignSelf: "stretch",
   },
   row: {
     flexDirection: "row",

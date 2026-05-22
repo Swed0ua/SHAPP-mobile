@@ -13,5 +13,11 @@
     "system": "System",
     "light": "Light",
     "dark": "Dark"
+  },
+  "nav": {
+    "homeTitle": "Home",
+    "profileTitle": "Profile",
+    "toProfile": "Go to profile",
+    "toHome": "Back to home"
   }
 }
