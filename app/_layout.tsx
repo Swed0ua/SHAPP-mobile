@@ -7,16 +7,26 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AppBottomNavBar } from "../src/components/AppBottomNavBar";
 import { useAppShellBootstrap } from "../src/hooks/useAppShellBootstrap";
+import { useTheme } from "../src/theme";
 
 export default function RootLayout() {
   const { isAppShellReady } = useAppShellBootstrap();
+  const { theme } = useTheme();
 
   if (!isAppShellReady) {
     return (
       <SafeAreaProvider>
-        <View style={styles.boot}>
-          <ActivityIndicator size="large" color="#52525B" />
-          <StatusBar style="auto" />
+        <View
+          style={[
+            styles.boot,
+            { backgroundColor: theme.colors.background.canvas },
+          ]}
+        >
+          <ActivityIndicator
+            size="large"
+            color={theme.colors.content.secondary}
+          />
+          <StatusBar style={theme.mode === "dark" ? "light" : "dark"} />
         </View>
       </SafeAreaProvider>
     );
@@ -24,17 +34,27 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <View style={styles.root}>
+      <View
+        style={[styles.root, { backgroundColor: theme.colors.background.canvas }]}
+      >
         <Stack
           screenOptions={{
             headerShadowVisible: false,
+            contentStyle: {
+              backgroundColor: theme.colors.background.canvas,
+            },
+            headerStyle: {
+              backgroundColor: theme.colors.background.canvas,
+            },
+            headerTintColor: theme.colors.content.primary,
+            navigationBarColor: theme.colors.background.canvas,
           }}
         >
           <Stack.Screen name="index" options={{ title: "Home" }} />
           <Stack.Screen name="profile" options={{ title: "Profile" }} />
         </Stack>
         <AppBottomNavBar />
-        <StatusBar style="auto" />
+        <StatusBar style={theme.mode === "dark" ? "light" : "dark"} />
       </View>
     </SafeAreaProvider>
   );
@@ -48,6 +68,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#E4E4E7",
   },
 });

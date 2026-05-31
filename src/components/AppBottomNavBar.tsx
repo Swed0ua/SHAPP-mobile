@@ -23,6 +23,7 @@ interface AppBottomNavTabConfig {
   readonly iconActive?: BottomNavIconName;
   readonly labelKey: TabLabelKey;
   readonly targetRoute: AppRoute;
+  readonly activeRoutes: readonly AppRoute[];
 }
 
 interface AppBottomNavCenterActionConfig {
@@ -38,13 +39,15 @@ const TAB_CONFIGS: readonly AppBottomNavTabConfig[] = [
     iconActive: "menu",
     labelKey: "tabs.menu",
     targetRoute: "/",
+    activeRoutes: [],
   },
   {
     key: "home",
     icon: "home-outline",
     iconActive: "home",
     labelKey: "tabs.home",
-    targetRoute: "/profile",
+    targetRoute: "/",
+    activeRoutes: ["/"],
   },
   {
     key: "calendar",
@@ -52,6 +55,7 @@ const TAB_CONFIGS: readonly AppBottomNavTabConfig[] = [
     iconActive: "calendar",
     labelKey: "tabs.calendar",
     targetRoute: "/",
+    activeRoutes: [],
   },
   {
     key: "profile",
@@ -59,6 +63,7 @@ const TAB_CONFIGS: readonly AppBottomNavTabConfig[] = [
     iconActive: "person",
     labelKey: "tabs.profile",
     targetRoute: "/profile",
+    activeRoutes: ["/profile"],
   },
 ];
 
@@ -85,7 +90,7 @@ export function AppBottomNavBar() {
         iconActive: config.iconActive,
         accessibilityLabel: t(config.labelKey),
         onPress: () => navigate(config.targetRoute),
-        isActive: pathname === config.targetRoute,
+        isActive: config.activeRoutes.includes(pathname as AppRoute),
       })),
     [navigate, pathname, t],
   );

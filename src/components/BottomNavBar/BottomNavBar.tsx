@@ -61,7 +61,7 @@ export const BottomNavBar = memo<BottomNavBarProps>(
               },
             ]}
           >
-            <View style={styles.row}>
+            <View style={[styles.row]}>
               {leftTabs.map((tab) => (
                 <TabButton key={tab.key} tab={tab} />
               ))}
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     paddingHorizontal: BAR_HORIZONTAL_MARGIN,
-    alignItems: "stretch",
+    alignItems: "stretch"
   },
   barContainer: {
     position: "relative",
