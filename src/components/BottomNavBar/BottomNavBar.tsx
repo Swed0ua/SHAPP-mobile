@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTheme } from "../../theme";
+import { NotchedRect } from "../NotchedRect/NotchedRect";
 import {
   CENTER_ACTION_BUTTON_SIZE,
   CenterActionButton,
@@ -13,8 +14,12 @@ import type { BottomNavBarProps, BottomNavTab } from "./types";
 const BAR_HEIGHT = 64;
 const BAR_HORIZONTAL_MARGIN = 16;
 const BAR_BOTTOM_MARGIN = 8;
-const FAB_OVERLAP = CENTER_ACTION_BUTTON_SIZE / 2;
+const FAB_OVERLAP = CENTER_ACTION_BUTTON_SIZE;
 const CENTER_SLOT_WIDTH = CENTER_ACTION_BUTTON_SIZE + 16;
+
+const BAR_CORNER_RADIUS = BAR_HEIGHT / 2;
+const NOTCH_WIDTH = 180;
+const NOTCH_DEPTH = 26;
 
 interface SplitTabs {
   readonly leftTabs: readonly BottomNavTab[];
@@ -37,8 +42,6 @@ export const BottomNavBar = memo<BottomNavBarProps>(
       };
     }, [tabs, centerAction]);
 
-    const isDark = theme.mode === "dark";
-
     return (
       <View
         pointerEvents="box-none"
@@ -51,17 +54,18 @@ export const BottomNavBar = memo<BottomNavBarProps>(
         ]}
       >
         <View pointerEvents="box-none" style={styles.barContainer}>
-          <View
-            style={[
-              styles.bar,
-              {
-                backgroundColor: theme.colors.background.elevated,
-                borderColor: theme.colors.stroke.subtle,
-                shadowColor: isDark ? "#000000" : "#0F172A",
-              },
-            ]}
-          >
-            <View style={[styles.row]}>
+          <View style={styles.bar}>
+            <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+              <NotchedRect
+                height={BAR_HEIGHT}
+                notchWidth={centerAction ? NOTCH_WIDTH : 0}
+                notchDepth={centerAction ? NOTCH_DEPTH : 0}
+                cornerRadius={BAR_CORNER_RADIUS}
+                fill={theme.colors.background.elevated}
+              />
+            </View>
+
+            <View style={styles.row}>
               {leftTabs.map((tab) => (
                 <TabButton key={tab.key} tab={tab} />
               ))}
@@ -92,7 +96,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     paddingHorizontal: BAR_HORIZONTAL_MARGIN,
-    alignItems: "stretch"
+    alignItems: "stretch",
   },
   barContainer: {
     position: "relative",
@@ -100,12 +104,6 @@ const styles = StyleSheet.create({
   },
   bar: {
     height: BAR_HEIGHT,
-    borderRadius: BAR_HEIGHT / 2,
-    borderWidth: StyleSheet.hairlineWidth,
-    shadowOpacity: 0.22,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 10,
     overflow: "hidden",
   },
   row: {
