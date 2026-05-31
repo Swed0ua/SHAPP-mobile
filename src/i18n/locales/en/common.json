@@ -19,5 +19,12 @@
     "profileTitle": "Profile",
     "toProfile": "Go to profile",
     "toHome": "Back to home"
+  },
+  "tabs": {
+    "menu": "Menu",
+    "home": "Home",
+    "calendar": "Calendar",
+    "profile": "Profile",
+    "add": "Add"
   }
 }
