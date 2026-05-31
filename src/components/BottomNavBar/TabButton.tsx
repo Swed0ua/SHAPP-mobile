@@ -44,7 +44,7 @@ export const TabButton = memo<TabButtonProps>(({ tab }) => {
           <View
             style={[
               styles.glowSource,
-              { backgroundColor: ACTIVE_GLOW_COLOR },
+              { backgroundColor: ACTIVE_GLOW_COLOR, opacity: 0.4 },
             ]}
           />
           <BlurView
