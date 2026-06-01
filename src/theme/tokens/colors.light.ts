@@ -22,6 +22,7 @@ const accent = {
   default: "#2563EB",
   onAccent: "#FFFFFF",
   muted: "rgba(37, 99, 235, 0.12)",
+  glow: "#42AB49",
 } as const;
 
 const status = {
@@ -50,6 +51,7 @@ export const lightThemeColors: ThemeColors = {
     default: accent.default,
     onAccent: accent.onAccent,
     muted: accent.muted,
+    glow: accent.glow,
   },
   status: {
     danger: status.error,

@@ -3,10 +3,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet } from "react-native";
 
 import { useTheme } from "../../theme";
+import {
+  CENTER_ACTION_BUTTON_SIZE,
+  CENTER_ACTION_ICON_SIZE,
+} from "./constants";
 import type { BottomNavCenterAction } from "./types";
 
-const SIZE = 56;
-const ICON_SIZE = 28;
 const HIT_SLOP = 8;
 
 interface CenterActionButtonProps {
@@ -33,7 +35,7 @@ export const CenterActionButton = memo<CenterActionButtonProps>(({ action }) => 
     >
       <Ionicons
         name={action.icon}
-        size={ICON_SIZE}
+        size={CENTER_ACTION_ICON_SIZE}
         color={theme.colors.accent.onAccent}
       />
     </Pressable>
@@ -44,19 +46,17 @@ CenterActionButton.displayName = "CenterActionButton";
 
 const styles = StyleSheet.create({
   container: {
-    width: SIZE,
-    height: SIZE,
-    borderRadius: SIZE / 2,
+    width: CENTER_ACTION_BUTTON_SIZE,
+    height: CENTER_ACTION_BUTTON_SIZE,
+    borderRadius: CENTER_ACTION_BUTTON_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
     shadowOpacity: 0.45,
     shadowRadius: 14,
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 0 },
     elevation: 12,
   },
   pressed: {
     transform: [{ scale: 0.94 }],
   },
 });
-
-export const CENTER_ACTION_BUTTON_SIZE = SIZE;

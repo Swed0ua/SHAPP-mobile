@@ -4,16 +4,17 @@ import { BlurView } from "expo-blur";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { useTheme } from "../../theme";
+import {
+  TAB_ACTIVE_GLOW_AREA_SIZE,
+  TAB_ACTIVE_GLOW_BLUR_INTENSITY,
+  TAB_ACTIVE_GLOW_OPACITY,
+  TAB_ACTIVE_GLOW_SOURCE_SIZE,
+  TAB_ICON_SIZE,
+} from "./constants";
 import type { BottomNavTab } from "./types";
 
-const ICON_SIZE = 26;
 const HIT_SLOP = 8;
 const PRESSED_OPACITY = 0.55;
-
-const ACTIVE_GLOW_COLOR = "#42AB49";
-const GLOW_AREA_SIZE = 86;
-const GLOW_SOURCE_SIZE = 48;
-const GLOW_BLUR_INTENSITY = 60;
 
 interface TabButtonProps {
   readonly tab: BottomNavTab;
@@ -44,18 +45,21 @@ export const TabButton = memo<TabButtonProps>(({ tab }) => {
           <View
             style={[
               styles.glowSource,
-              { backgroundColor: ACTIVE_GLOW_COLOR, opacity: 0.4 },
+              {
+                backgroundColor: theme.colors.accent.glow,
+                opacity: TAB_ACTIVE_GLOW_OPACITY,
+              },
             ]}
           />
           <BlurView
-            intensity={GLOW_BLUR_INTENSITY}
+            intensity={TAB_ACTIVE_GLOW_BLUR_INTENSITY}
             tint={theme.mode === "dark" ? "dark" : "light"}
             experimentalBlurMethod="dimezisBlurView"
             style={styles.glowBlur}
           />
         </View>
       ) : null}
-      <Ionicons name={iconName} size={ICON_SIZE} color={iconColor} />
+      <Ionicons name={iconName} size={TAB_ICON_SIZE} color={iconColor} />
     </Pressable>
   );
 });
@@ -71,21 +75,21 @@ const styles = StyleSheet.create({
   },
   glowArea: {
     position: "absolute",
-    width: GLOW_AREA_SIZE,
-    height: GLOW_AREA_SIZE,
+    width: TAB_ACTIVE_GLOW_AREA_SIZE,
+    height: TAB_ACTIVE_GLOW_AREA_SIZE,
     alignItems: "center",
     justifyContent: "center",
   },
   glowSource: {
-    width: GLOW_SOURCE_SIZE,
-    height: GLOW_SOURCE_SIZE,
-    borderRadius: GLOW_SOURCE_SIZE / 2,
+    width: TAB_ACTIVE_GLOW_SOURCE_SIZE,
+    height: TAB_ACTIVE_GLOW_SOURCE_SIZE,
+    borderRadius: TAB_ACTIVE_GLOW_SOURCE_SIZE / 2,
   },
   glowBlur: {
     position: "absolute",
-    width: GLOW_AREA_SIZE,
-    height: GLOW_AREA_SIZE,
-    borderRadius: GLOW_AREA_SIZE / 2,
+    width: TAB_ACTIVE_GLOW_AREA_SIZE,
+    height: TAB_ACTIVE_GLOW_AREA_SIZE,
+    borderRadius: TAB_ACTIVE_GLOW_AREA_SIZE / 2,
     overflow: "hidden",
   },
 });

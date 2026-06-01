@@ -24,6 +24,7 @@ export interface ThemeAccentColors {
   readonly default: string;
   readonly onAccent: string;
   readonly muted: string;
+  readonly glow: string;
 }
 
 export interface ThemeStatusColors {

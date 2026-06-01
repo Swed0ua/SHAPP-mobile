@@ -1,0 +1,16 @@
+export const BAR_HEIGHT = 64;
+export const BAR_CORNER_RADIUS = BAR_HEIGHT / 2;
+
+export const CENTER_ACTION_BUTTON_SIZE = 70;
+export const CENTER_ACTION_ICON_SIZE = 42;
+export const FAB_OVERLAP = CENTER_ACTION_BUTTON_SIZE;
+export const CENTER_SLOT_WIDTH = CENTER_ACTION_BUTTON_SIZE + 16;
+
+export const NOTCH_WIDTH = 180;
+export const NOTCH_DEPTH = 26;
+
+export const TAB_ICON_SIZE = 26;
+export const TAB_ACTIVE_GLOW_AREA_SIZE = 86;
+export const TAB_ACTIVE_GLOW_SOURCE_SIZE = 48;
+export const TAB_ACTIVE_GLOW_BLUR_INTENSITY = 60;
+export const TAB_ACTIVE_GLOW_OPACITY = 0.4;
