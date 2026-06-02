@@ -1,14 +1,22 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
 import {
   type LayoutChangeEvent,
   type StyleProp,
   View,
   type ViewStyle,
 } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import Svg, { Defs, FeDropShadow, Filter, Path } from "react-native-svg";
 
 const NOTCH_TOP_TANGENT_FACTOR = 0.25;
 const NOTCH_BOTTOM_TANGENT_FACTOR = 0.2;
+
+export interface NotchedRectDropShadow {
+  readonly color: string;
+  readonly blur: number;
+  readonly dx?: number;
+  readonly dy?: number;
+  readonly opacity?: number;
+}
 
 export interface NotchedRectProps {
   readonly height: number;
@@ -19,6 +27,7 @@ export interface NotchedRectProps {
   readonly notchCenterX?: number;
   readonly stroke?: string;
   readonly strokeWidth?: number;
+  readonly shadow?: NotchedRectDropShadow;
   readonly style?: StyleProp<ViewStyle>;
 }
 
@@ -29,6 +38,13 @@ interface BuildNotchedRectPathArgs {
   readonly notchWidth: number;
   readonly notchDepth: number;
   readonly notchCenterX: number;
+}
+
+interface ShadowGeometry {
+  readonly padLeft: number;
+  readonly padRight: number;
+  readonly padTop: number;
+  readonly padBottom: number;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -97,6 +113,25 @@ function buildNotchedRectPath({
   return segments.join(" ");
 }
 
+function computeShadowGeometry(
+  shadow: NotchedRectDropShadow | undefined,
+): ShadowGeometry {
+  if (shadow == null) {
+    return { padLeft: 0, padRight: 0, padTop: 0, padBottom: 0 };
+  }
+
+  const dx = shadow.dx ?? 0;
+  const dy = shadow.dy ?? 0;
+  const blur = Math.max(0, shadow.blur);
+
+  return {
+    padLeft: Math.ceil(blur + Math.max(0, -dx)),
+    padRight: Math.ceil(blur + Math.max(0, dx)),
+    padTop: Math.ceil(blur + Math.max(0, -dy)),
+    padBottom: Math.ceil(blur + Math.max(0, dy)),
+  };
+}
+
 export const NotchedRect = memo<NotchedRectProps>(
   ({
     height,
@@ -107,9 +142,13 @@ export const NotchedRect = memo<NotchedRectProps>(
     notchCenterX,
     stroke,
     strokeWidth,
+    shadow,
     style,
   }) => {
     const [width, setWidth] = useState(0);
+    const filterIdRef = useRef(
+      `notched-rect-shadow-${Math.random().toString(36).slice(2, 10)}`,
+    );
 
     const handleLayout = (event: LayoutChangeEvent) => {
       const nextWidth = event.nativeEvent.layout.width;
@@ -133,18 +172,68 @@ export const NotchedRect = memo<NotchedRectProps>(
       });
     }, [cornerRadius, height, notchCenterX, notchDepth, notchWidth, width]);
 
+    const shadowGeometry = useMemo(
+      () => computeShadowGeometry(shadow),
+      [shadow],
+    );
+
+    if (pathData == null) {
+      return <View onLayout={handleLayout} style={[{ height }, style]} />;
+    }
+
+    const hasShadow = shadow != null;
+    const svgWidth =
+      width + shadowGeometry.padLeft + shadowGeometry.padRight;
+    const svgHeight =
+      height + shadowGeometry.padTop + shadowGeometry.padBottom;
+    const pathTransform = hasShadow
+      ? `translate(${shadowGeometry.padLeft} ${shadowGeometry.padTop})`
+      : undefined;
+    const pathFilter = hasShadow ? `url(#${filterIdRef.current})` : undefined;
+    const svgStyle = hasShadow
+      ? {
+          position: "absolute" as const,
+          top: -shadowGeometry.padTop,
+          left: -shadowGeometry.padLeft,
+        }
+      : undefined;
+
     return (
       <View onLayout={handleLayout} style={[{ height }, style]}>
-        {pathData == null ? null : (
-          <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-            <Path
-              d={pathData}
-              fill={fill}
-              stroke={stroke}
-              strokeWidth={strokeWidth}
-            />
-          </Svg>
-        )}
+        <Svg
+          width={svgWidth}
+          height={svgHeight}
+          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+          style={svgStyle}
+        >
+          {hasShadow ? (
+            <Defs>
+              <Filter
+                id={filterIdRef.current}
+                x="-50%"
+                y="-50%"
+                width="200%"
+                height="200%"
+              >
+                <FeDropShadow
+                  dx={shadow.dx ?? 0}
+                  dy={shadow.dy ?? 0}
+                  stdDeviation={shadow.blur / 2}
+                  floodColor={shadow.color}
+                  floodOpacity={shadow.opacity ?? 1}
+                />
+              </Filter>
+            </Defs>
+          ) : null}
+          <Path
+            d={pathData}
+            fill={fill}
+            stroke={stroke}
+            strokeWidth={strokeWidth}
+            transform={pathTransform}
+            filter={pathFilter}
+          />
+        </Svg>
       </View>
     );
   },

@@ -58,6 +58,13 @@ export const BottomNavBar = memo<BottomNavBarProps>(
                 notchDepth={centerAction ? NOTCH_DEPTH : 0}
                 cornerRadius={BAR_CORNER_RADIUS}
                 fill={theme.colors.background.elevated}
+                shadow={{
+                  color: "#1DD77A",
+                  blur: 30,
+                  dx: 0,
+                  dy: 6,
+                  opacity: 0.06,
+                }}
               />
             </View>
 
@@ -104,7 +111,6 @@ const styles = StyleSheet.create({
   },
   bar: {
     height: BAR_HEIGHT,
-    overflow: "hidden",
   },
   row: {
     flexDirection: "row",

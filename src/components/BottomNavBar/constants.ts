@@ -10,7 +10,7 @@ export const NOTCH_WIDTH = 180;
 export const NOTCH_DEPTH = 26;
 
 export const TAB_ICON_SIZE = 26;
-export const TAB_ACTIVE_GLOW_AREA_SIZE = 86;
-export const TAB_ACTIVE_GLOW_SOURCE_SIZE = 48;
-export const TAB_ACTIVE_GLOW_BLUR_INTENSITY = 60;
-export const TAB_ACTIVE_GLOW_OPACITY = 0.4;
+export const TAB_ACTIVE_GLOW_AREA_SIZE = 82;
+export const TAB_ACTIVE_GLOW_SOURCE_SIZE = 40;
+export const TAB_ACTIVE_GLOW_BLUR_INTENSITY = 74;
+export const TAB_ACTIVE_GLOW_OPACITY = 0.35;
