@@ -1,4 +1,19 @@
-import { RING_COLOR_STOPS } from "./constants";
+// Single source of truth for the "progress" color scale shared by the
+// ProgressRing and the calendar day cards.
+//
+// Color is a function of progress ratio (0 -> 1.2):
+//   0-50%  : yellow -> light green
+//   50-100%: green (increasing saturation)
+//   >100%  : orange -> red
+// Theme-independent by design, so progress reads the same in light/dark.
+export const PROGRESS_COLOR_STOPS = [
+  { at: 0, color: "#FACC15" },
+  { at: 0.5, color: "#86EFAC" },
+  { at: 0.8, color: "#22C55E" },
+  { at: 1.0, color: "#15A33F" },
+  { at: 1.1, color: "#F97316" },
+  { at: 1.2, color: "#DC2626" },
+] as const;
 
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
@@ -23,17 +38,17 @@ function channelToHex(channel: number): string {
   return Math.round(channel).toString(16).padStart(2, "0").toUpperCase();
 }
 
-/**
- * Maps a progress ratio (0 -> 1.2+) to a solid color, smoothly interpolated
- * in RGB between the configured stops. Theme-independent by design.
- */
 interface ColorStop {
   readonly at: number;
   readonly color: string;
 }
 
-export function interpolateRingColor(ratio: number): string {
-  const stops: readonly ColorStop[] = RING_COLOR_STOPS;
+/**
+ * Maps a progress ratio (0 -> 1.2+) to a solid color, smoothly interpolated
+ * in RGB between the configured stops.
+ */
+export function interpolateProgressColor(ratio: number): string {
+  const stops: readonly ColorStop[] = PROGRESS_COLOR_STOPS;
   const first = stops[0];
   const last = stops[stops.length - 1];
   const clamped = clamp(ratio, first.at, last.at);

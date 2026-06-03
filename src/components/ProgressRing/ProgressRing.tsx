@@ -18,7 +18,7 @@ import {
   RING_TICK_LENGTH,
   RING_TRACK_STROKE_WIDTH,
 } from "./constants";
-import { clamp, interpolateRingColor } from "./gradient";
+import { clamp, interpolateProgressColor } from "../../utils/progressColor";
 
 export interface ProgressRingProps {
   readonly value: number;
@@ -42,7 +42,7 @@ export const ProgressRing = memo<ProgressRingProps>(
     const tickUnit = circumference / RING_TICK_COUNT;
     const tickGap = Math.max(tickUnit - RING_TICK_LENGTH, 0);
 
-    const progressColor = interpolateRingColor(ratio);
+    const progressColor = interpolateProgressColor(ratio);
     const glowBoxShadow = `0 0 ${RING_GLOW_BLUR}px ${RING_GLOW_SPREAD}px ${progressColor}${RING_GLOW_OPACITY_HEX}`;
 
     const scale = size / RING_SIZE;
