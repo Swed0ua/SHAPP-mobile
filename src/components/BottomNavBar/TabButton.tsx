@@ -1,14 +1,13 @@
 import { memo } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { useTheme } from "../../theme";
 import {
-  TAB_ACTIVE_GLOW_AREA_SIZE,
-  TAB_ACTIVE_GLOW_BLUR_INTENSITY,
-  TAB_ACTIVE_GLOW_OPACITY,
-  TAB_ACTIVE_GLOW_SOURCE_SIZE,
+  TAB_ACTIVE_DOT_GLOW_BLUR,
+  TAB_ACTIVE_DOT_GLOW_OPACITY_HEX,
+  TAB_ACTIVE_DOT_GLOW_SPREAD,
+  TAB_ACTIVE_DOT_SIZE,
   TAB_ICON_SIZE,
 } from "./constants";
 import type { BottomNavTab } from "./types";
@@ -27,6 +26,8 @@ export const TabButton = memo<TabButtonProps>(({ tab }) => {
   const iconColor = isActive
     ? theme.colors.content.primary
     : theme.colors.content.secondary;
+  const glowColor = theme.colors.accent.glow;
+  const dotBoxShadow = `0 0 ${TAB_ACTIVE_DOT_GLOW_BLUR}px ${TAB_ACTIVE_DOT_GLOW_SPREAD}px ${glowColor}${TAB_ACTIVE_DOT_GLOW_OPACITY_HEX}`;
 
   return (
     <Pressable
@@ -41,21 +42,15 @@ export const TabButton = memo<TabButtonProps>(({ tab }) => {
       ]}
     >
       {isActive ? (
-        <View pointerEvents="none" style={styles.glowArea}>
+        <View pointerEvents="none" style={styles.dotWrapper}>
           <View
             style={[
-              styles.glowSource,
+              styles.dot,
               {
-                backgroundColor: theme.colors.accent.glow,
-                opacity: TAB_ACTIVE_GLOW_OPACITY,
+                backgroundColor: glowColor,
+                boxShadow: dotBoxShadow,
               },
             ]}
-          />
-          <BlurView
-            intensity={TAB_ACTIVE_GLOW_BLUR_INTENSITY}
-            tint={theme.mode === "dark" ? "dark" : "light"}
-            experimentalBlurMethod="dimezisBlurView"
-            style={styles.glowBlur}
           />
         </View>
       ) : null}
@@ -73,23 +68,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  glowArea: {
-    position: "absolute",
-    width: TAB_ACTIVE_GLOW_AREA_SIZE,
-    height: TAB_ACTIVE_GLOW_AREA_SIZE,
+  dotWrapper: {
+    ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
   },
-  glowSource: {
-    width: TAB_ACTIVE_GLOW_SOURCE_SIZE,
-    height: TAB_ACTIVE_GLOW_SOURCE_SIZE,
-    borderRadius: TAB_ACTIVE_GLOW_SOURCE_SIZE / 2,
-  },
-  glowBlur: {
-    position: "absolute",
-    width: TAB_ACTIVE_GLOW_AREA_SIZE,
-    height: TAB_ACTIVE_GLOW_AREA_SIZE,
-    borderRadius: TAB_ACTIVE_GLOW_AREA_SIZE / 2,
-    overflow: "hidden",
+  dot: {
+    width: TAB_ACTIVE_DOT_SIZE,
+    height: TAB_ACTIVE_DOT_SIZE,
+    borderRadius: TAB_ACTIVE_DOT_SIZE / 2,
   },
 });

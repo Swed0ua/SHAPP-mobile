@@ -5,6 +5,9 @@ import { Pressable, StyleSheet } from "react-native";
 import { useTheme } from "../../theme";
 import {
   CENTER_ACTION_BUTTON_SIZE,
+  CENTER_ACTION_GLOW_BLUR,
+  CENTER_ACTION_GLOW_OPACITY_HEX,
+  CENTER_ACTION_GLOW_SPREAD,
   CENTER_ACTION_ICON_SIZE,
 } from "./constants";
 import type { BottomNavCenterAction } from "./types";
@@ -17,6 +20,8 @@ interface CenterActionButtonProps {
 
 export const CenterActionButton = memo<CenterActionButtonProps>(({ action }) => {
   const { theme } = useTheme();
+  const accentColor = theme.colors.accent.default;
+  const glowBoxShadow = `0 0 ${CENTER_ACTION_GLOW_BLUR}px ${CENTER_ACTION_GLOW_SPREAD}px ${accentColor}${CENTER_ACTION_GLOW_OPACITY_HEX}`;
 
   return (
     <Pressable
@@ -27,7 +32,8 @@ export const CenterActionButton = memo<CenterActionButtonProps>(({ action }) => 
       style={({ pressed }) => [
         styles.container,
         {
-          backgroundColor: theme.colors.accent.default,
+          backgroundColor: accentColor,
+          boxShadow: glowBoxShadow,
         },
         pressed && styles.pressed,
       ]}
@@ -50,11 +56,6 @@ const styles = StyleSheet.create({
     borderRadius: CENTER_ACTION_BUTTON_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#1DD77A",
-    shadowOpacity: 0.01,
-    shadowRadius: 30,
-    shadowOffset: { width: 0, height: -0 },
-    elevation: 6,
   },
   pressed: {
     transform: [{ scale: 0.94 }],
