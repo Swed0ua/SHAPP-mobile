@@ -13,7 +13,7 @@ export default function HomeScreen() {
         { backgroundColor: theme.colors.background.canvas },
       ]}
     >
-      <ProgressRing value={40} target={2200} />
+      <ProgressRing value={1110} target={2200} />
     </View>
   );
 }

@@ -9,6 +9,7 @@ import {
   RING_GLOW_DOT_SIZE,
   RING_GLOW_OPACITY_HEX,
   RING_GLOW_SPREAD,
+  RING_PILL_TEXT_COLOR,
   RING_PROGRESS_STROKE_WIDTH,
   RING_RADIUS,
   RING_SIZE,
@@ -17,6 +18,7 @@ import {
   RING_TICK_LENGTH,
   RING_TRACK_STROKE_WIDTH,
 } from "./constants";
+import { clamp, interpolateRingColor } from "./gradient";
 
 export interface ProgressRingProps {
   readonly value: number;
@@ -24,17 +26,14 @@ export interface ProgressRingProps {
   readonly size?: number;
 }
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
-}
-
 export const ProgressRing = memo<ProgressRingProps>(
   ({ value, target, size = RING_SIZE }) => {
     const { theme } = useTheme();
 
     const safeTarget = target > 0 ? target : 0;
-    const progress = safeTarget > 0 ? clamp(value / safeTarget, 0, 1) : 0;
-    const percent = Math.round(progress * 100);
+    const ratio = safeTarget > 0 ? value / safeTarget : 0;
+    const progress = clamp(ratio, 0, 1);
+    const percent = Math.round(ratio * 100);
 
     const center = RING_SIZE / 2;
     const circumference = 2 * Math.PI * RING_RADIUS;
@@ -43,8 +42,8 @@ export const ProgressRing = memo<ProgressRingProps>(
     const tickUnit = circumference / RING_TICK_COUNT;
     const tickGap = Math.max(tickUnit - RING_TICK_LENGTH, 0);
 
-    const accentColor = theme.colors.accent.default;
-    const glowBoxShadow = `0 0 ${RING_GLOW_BLUR}px ${RING_GLOW_SPREAD}px ${accentColor}${RING_GLOW_OPACITY_HEX}`;
+    const progressColor = interpolateRingColor(ratio);
+    const glowBoxShadow = `0 0 ${RING_GLOW_BLUR}px ${RING_GLOW_SPREAD}px ${progressColor}${RING_GLOW_OPACITY_HEX}`;
 
     const scale = size / RING_SIZE;
     const centerPx = size / 2;
@@ -75,7 +74,7 @@ export const ProgressRing = memo<ProgressRingProps>(
                 width: RING_GLOW_DOT_SIZE,
                 height: RING_GLOW_DOT_SIZE,
                 borderRadius: RING_GLOW_DOT_SIZE / 2,
-                backgroundColor: accentColor,
+                backgroundColor: progressColor,
                 boxShadow: glowBoxShadow,
               }}
             />
@@ -99,7 +98,7 @@ export const ProgressRing = memo<ProgressRingProps>(
               cx={center}
               cy={center}
               r={RING_RADIUS}
-              stroke={accentColor}
+              stroke={progressColor}
               strokeWidth={RING_PROGRESS_STROKE_WIDTH}
               strokeDasharray={[progressLength, circumference]}
               strokeLinecap="round"
@@ -125,10 +124,8 @@ export const ProgressRing = memo<ProgressRingProps>(
           >
             {value}
           </Text>
-          <View style={[styles.pill, { backgroundColor: accentColor }]}>
-            <Text
-              style={[styles.pillText, { color: theme.colors.accent.onAccent }]}
-            >
+          <View style={[styles.pill, { backgroundColor: progressColor }]}>
+            <Text style={[styles.pillText, { color: RING_PILL_TEXT_COLOR }]}>
               {percent}%
             </Text>
           </View>
