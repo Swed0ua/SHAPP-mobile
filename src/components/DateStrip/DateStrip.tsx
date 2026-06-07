@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -122,7 +123,7 @@ export const DateStrip = memo<DateStripProps>(
             onPress={handleGoToToday}
             style={({ pressed }) => [
               styles.goToToday,
-              { right: theme.spacing.lg },
+              { right: theme.spacing.sm },
               pressed && styles.pressed,
             ]}
           >
@@ -134,6 +135,12 @@ export const DateStrip = memo<DateStripProps>(
             >
               {t("calendar.goToToday")}
             </Text>
+            <Ionicons
+              name="arrow-forward"
+              size={14}
+              color={theme.colors.content.secondary}
+              style={{marginBottom: 2}}
+            />
           </Pressable>
         ) : null}
       </View>
@@ -166,10 +173,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     height: GO_TO_TODAY_SLOT_HEIGHT,
-    justifyContent: "flex-end",
+    flexDirection: "row",
+    alignItems: "flex-end",
+    display: "flex",
+    gap: 4,
   },
   goToTodayText: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "500",
   },
   pressed: {

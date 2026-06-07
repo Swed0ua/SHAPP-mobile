@@ -3,7 +3,7 @@ import "../src/i18n";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppBottomNavBar } from "../src/components/AppBottomNavBar";
 import { useAppShellBootstrap } from "../src/hooks/useAppShellBootstrap";
@@ -12,6 +12,7 @@ import { useTheme } from "../src/theme";
 export default function RootLayout() {
   const { isAppShellReady } = useAppShellBootstrap();
   const { theme } = useTheme();
+  const {top: topInsets} = useSafeAreaInsets();
 
   if (!isAppShellReady) {
     return (
@@ -39,9 +40,11 @@ export default function RootLayout() {
       >
         <Stack
           screenOptions={{
+            headerShown: false,
             headerShadowVisible: false,
             contentStyle: {
               backgroundColor: theme.colors.background.canvas,
+              paddingTop: topInsets
             },
             headerStyle: {
               backgroundColor: theme.colors.background.canvas,
