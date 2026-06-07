@@ -20,6 +20,9 @@
     "toProfile": "До профілю",
     "toHome": "На головну"
   },
+  "calendar": {
+    "goToToday": "До сьогодні"
+  },
   "tabs": {
     "menu": "Меню",
     "home": "Головна",

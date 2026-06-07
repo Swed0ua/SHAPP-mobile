@@ -20,3 +20,10 @@ export const INITIAL_LEADING_DAYS = 3;
 // theme-independent so the selected day reads the same in light/dark.
 export const SELECTED_FILL_COLOR = "#00D1FF";
 export const SELECTED_TEXT_COLOR = "#0B0F14";
+
+/**
+ * Reserved height below the strip for the "go to today" link. The link is
+ * absolutely positioned inside this slot so toggling its visibility never
+ * reflows the surrounding layout.
+ */
+export const GO_TO_TODAY_SLOT_HEIGHT = 40;

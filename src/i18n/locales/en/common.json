@@ -20,6 +20,9 @@
     "toProfile": "Go to profile",
     "toHome": "Back to home"
   },
+  "calendar": {
+    "goToToday": "Back to today"
+  },
   "tabs": {
     "menu": "Menu",
     "home": "Home",
