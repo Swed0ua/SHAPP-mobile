@@ -88,6 +88,9 @@ export const DayCard = memo<DayCardProps>(({ day, isSelected, onSelect }) => {
     ? SELECTED_FILL_COLOR
     : interpolateProgressColor(ratio);
   const showProgress = isFilled || day.percent > 0;
+  // At full fill draw a continuous closed stroke (no dash, no round caps) so
+  // the two rounded cap ends don't overlap into a bump at the top seam.
+  const isFull = fillLength >= RING_PERIMETER - 0.001;
 
   return (
     <Pressable
@@ -118,8 +121,8 @@ export const DayCard = memo<DayCardProps>(({ day, isSelected, onSelect }) => {
             fill="none"
             stroke={progressColor}
             strokeWidth={CARD_PROGRESS_STROKE_WIDTH}
-            strokeLinecap="round"
-            strokeDasharray={[fillLength, RING_PERIMETER]}
+            strokeLinecap={isFull ? "butt" : "round"}
+            strokeDasharray={isFull ? undefined : [fillLength, RING_PERIMETER]}
           />
         ) : null}
       </Svg>
