@@ -20,6 +20,7 @@ import {
 } from "./constants";
 import { DayCard } from "./DayCard";
 import { buildMockDays, todayId } from "./mock";
+import { SelectedDateLabel } from "./SelectedDateLabel";
 import type { CalendarDay } from "./types";
 
 export interface DateStripProps {
@@ -54,6 +55,10 @@ export const DateStrip = memo<DateStripProps>(
       },
       [onChangeSelected],
     );
+
+    const handleDateLabelPress = useCallback(() => {
+      // Placeholder: a date picker / calendar modal will be wired here later.
+    }, []);
 
     const handleGoToToday = useCallback(() => {
       const todayIndex = days.findIndex((day) => day.isToday);
@@ -98,7 +103,7 @@ export const DateStrip = memo<DateStripProps>(
     );
 
     return (
-      <View style={styles.wrapper}>
+      <View>
         <FlatList
           ref={listRef}
           data={days}
@@ -116,33 +121,42 @@ export const DateStrip = memo<DateStripProps>(
           ]}
         />
 
-        {!isTodaySelected ? (
-          <Pressable
-            accessibilityRole="button"
-            hitSlop={8}
-            onPress={handleGoToToday}
-            style={({ pressed }) => [
-              styles.goToToday,
-              { right: theme.spacing.sm },
-              pressed && styles.pressed,
-            ]}
-          >
-            <Text
-              style={[
-                styles.goToTodayText,
-                { color: theme.colors.content.secondary },
+        <View style={[styles.footer, { marginTop: theme.spacing.sm }]}>
+          {!isTodaySelected ? (
+            <Pressable
+              accessibilityRole="button"
+              hitSlop={8}
+              onPress={handleGoToToday}
+              style={({ pressed }) => [
+                styles.goToToday,
+                { right: theme.spacing.sm },
+                pressed && styles.pressed,
               ]}
             >
-              {t("calendar.goToToday")}
-            </Text>
-            <Ionicons
-              name="arrow-forward"
-              size={14}
-              color={theme.colors.content.secondary}
-              style={{marginBottom: 2}}
+              <Text
+                style={[
+                  styles.goToTodayText,
+                  { color: theme.colors.content.secondary },
+                ]}
+              >
+                {t("calendar.goToToday")}
+              </Text>
+              <Ionicons
+                name="arrow-forward"
+                size={14}
+                color={theme.colors.content.secondary}
+                style={styles.goToTodayIcon}
+              />
+            </Pressable>
+          ) : null}
+
+          <View style={styles.dateLabel}>
+            <SelectedDateLabel
+              selectedId={selectedId}
+              onPress={handleDateLabelPress}
             />
-          </Pressable>
-        ) : null}
+          </View>
+        </View>
       </View>
     );
   },
@@ -159,11 +173,18 @@ function Separator() {
 }
 
 const styles = StyleSheet.create({
-  // Reserve the link's slot so showing/hiding it never reflows the layout.
-  wrapper: {
-    paddingBottom: GO_TO_TODAY_SLOT_HEIGHT,
-  },
   content: {
+    alignItems: "center",
+  },
+  footer: {
+    height: GO_TO_TODAY_SLOT_HEIGHT * 3,
+    position: "relative",
+  },
+  dateLabel: {
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    left: 0,
     alignItems: "center",
   },
   separator: {
@@ -171,15 +192,17 @@ const styles = StyleSheet.create({
   },
   goToToday: {
     position: "absolute",
-    bottom: 0,
+    top: 0,
     height: GO_TO_TODAY_SLOT_HEIGHT,
     flexDirection: "row",
     alignItems: "flex-end",
-    display: "flex",
     gap: 4,
   },
+  goToTodayIcon: {
+    marginBottom: 0,
+  },
   goToTodayText: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "500",
   },
   pressed: {

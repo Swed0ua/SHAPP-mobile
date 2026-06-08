@@ -21,7 +21,10 @@
     "toHome": "На головну"
   },
   "calendar": {
-    "goToToday": "До сьогодні"
+    "goToToday": "До сьогодні",
+    "today": "Сьогодні",
+    "yesterday": "Вчора",
+    "tomorrow": "Завтра"
   },
   "tabs": {
     "menu": "Меню",

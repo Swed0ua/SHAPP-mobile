@@ -26,4 +26,4 @@ export const SELECTED_TEXT_COLOR = "#0B0F14";
  * absolutely positioned inside this slot so toggling its visibility never
  * reflows the surrounding layout.
  */
-export const GO_TO_TODAY_SLOT_HEIGHT = 40;
+export const GO_TO_TODAY_SLOT_HEIGHT = 26;

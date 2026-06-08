@@ -25,6 +25,8 @@ export interface ThemeAccentColors {
   readonly onAccent: string;
   readonly muted: string;
   readonly glow: string;
+  /** Secondary brand accent (pink), used for highlights like the date label. */
+  readonly highlight: string;
 }
 
 export interface ThemeStatusColors {

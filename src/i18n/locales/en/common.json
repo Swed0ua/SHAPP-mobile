@@ -21,7 +21,10 @@
     "toHome": "Back to home"
   },
   "calendar": {
-    "goToToday": "Back to today"
+    "goToToday": "Back to today",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow"
   },
   "tabs": {
     "menu": "Menu",

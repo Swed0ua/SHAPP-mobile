@@ -29,6 +29,7 @@ const accent = {
   onAccent: surface.background,
   muted: "rgba(255, 61, 129, 0.18)",
   glow: "#42AB49",
+  highlight: brand.accent,
 } as const;
 
 const status = {
@@ -58,6 +59,7 @@ export const darkThemeColors: ThemeColors = {
     onAccent: accent.onAccent,
     muted: accent.muted,
     glow: accent.glow,
+    highlight: accent.highlight,
   },
   status: {
     danger: status.error,
