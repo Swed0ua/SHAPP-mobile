@@ -1,6 +1,12 @@
-// Render window around the selected day (mock stage; real paging comes later).
+// Render window around the anchor day (mock stage; real paging comes later).
 export const DAYS_BEFORE = 20;
 export const DAYS_AFTER = 20;
+
+/**
+ * Re-center the strip when the selected day gets within this many days of
+ * either edge of the rendered window, so there are always days to scroll into.
+ */
+export const EDGE_REANCHOR_THRESHOLD = 5;
 
 export const CARD_WIDTH = 70;
 export const CARD_HEIGHT = 90;

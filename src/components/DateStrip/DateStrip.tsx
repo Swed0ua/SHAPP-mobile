@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FlatList,
@@ -13,10 +13,12 @@ import {
 
 import { useCalendarStore } from "../../store";
 import { useTheme } from "../../theme";
+import { parseDateId } from "../../utils/date";
 import {
   CARD_GAP,
   CARD_STRIDE,
   CARD_WIDTH,
+  EDGE_REANCHOR_THRESHOLD,
   GO_TO_TODAY_SLOT_HEIGHT,
   INITIAL_LEADING_DAYS,
 } from "./constants";
@@ -39,8 +41,16 @@ export const DateStrip = memo<DateStripProps>(({ onChangeSelected }) => {
   const selectedId = useCalendarStore((state) => state.selectedId);
   const setSelectedId = useCalendarStore((state) => state.setSelectedId);
 
-  const days = useMemo(() => buildMockDays(), []);
   const todayIdValue = useMemo(() => todayId(), []);
+
+  // Day the window is centered on. Starts at the selected day and re-centers
+  // whenever the selection drifts near an edge (or lands outside the window).
+  const [anchorId, setAnchorId] = useState(selectedId);
+
+  const days = useMemo(
+    () => buildMockDays(parseDateId(anchorId)),
+    [anchorId],
+  );
 
   const selectedIndex = useMemo(
     () => days.findIndex((day) => day.id === selectedId),
@@ -48,6 +58,22 @@ export const DateStrip = memo<DateStripProps>(({ onChangeSelected }) => {
   );
   const initialScrollIndex = Math.max(0, selectedIndex - INITIAL_LEADING_DAYS);
   const isTodaySelected = selectedId === todayIdValue;
+
+  // Re-anchor the strip around the selected day when it sits within
+  // EDGE_REANCHOR_THRESHOLD of either edge, or falls outside the rendered window.
+  useEffect(() => {
+    if (selectedId === anchorId) {
+      return;
+    }
+    const index = days.findIndex((day) => day.id === selectedId);
+    const nearEdge =
+      index === -1 ||
+      index <= EDGE_REANCHOR_THRESHOLD ||
+      index >= days.length - 1 - EDGE_REANCHOR_THRESHOLD;
+    if (nearEdge) {
+      setAnchorId(selectedId);
+    }
+  }, [anchorId, days, selectedId]);
 
   const scrollToIndex = useCallback((index: number) => {
     if (index < 0) {

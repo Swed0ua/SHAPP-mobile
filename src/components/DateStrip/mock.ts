@@ -8,25 +8,42 @@ function weekdayLabel(date: Date): string {
     .toUpperCase();
 }
 
+/** Deterministic mock percent per day so re-anchoring never reshuffles values. */
+function mockPercent(id: string): number {
+  let hash = 0;
+  for (let i = 0; i < id.length; i += 1) {
+    hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+  }
+  return 15 + (hash % 95);
+}
+
 /**
- * Builds the [-DAYS_BEFORE .. +DAYS_AFTER] window around today.
+ * Builds the [-DAYS_BEFORE .. +DAYS_AFTER] window centered on `anchor`.
+ * `isToday`/`isFuture` are always evaluated against the real `today`, so the
+ * anchor can move without distorting which day is actually today.
  * Percentages are mocked; future days are 0%. Real data wiring comes later.
  */
-export function buildMockDays(reference: Date = new Date()): CalendarDay[] {
-  const today = startOfDay(reference);
+export function buildMockDays(
+  anchor: Date = new Date(),
+  today: Date = new Date(),
+): CalendarDay[] {
+  const center = startOfDay(anchor);
+  const todayMidnight = startOfDay(today);
   const days: CalendarDay[] = [];
 
   for (let offset = -DAYS_BEFORE; offset <= DAYS_AFTER; offset += 1) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + offset);
+    const date = new Date(center);
+    date.setDate(center.getDate() + offset);
 
-    const isFuture = offset > 0;
+    const isToday = date.getTime() === todayMidnight.getTime();
+    const isFuture = date.getTime() > todayMidnight.getTime();
+    const id = toDateId(date);
     days.push({
-      id: toDateId(date),
+      id,
       dayNumber: date.getDate(),
       weekday: weekdayLabel(date),
-      percent: isFuture ? 0 : Math.round(15 + Math.random() * 95),
-      isToday: offset === 0,
+      percent: isFuture ? 0 : mockPercent(id),
+      isToday,
       isFuture,
     });
   }
