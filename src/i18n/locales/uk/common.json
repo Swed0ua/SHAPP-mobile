@@ -24,7 +24,8 @@
     "goToToday": "До сьогодні",
     "today": "Сьогодні",
     "yesterday": "Вчора",
-    "tomorrow": "Завтра"
+    "tomorrow": "Завтра",
+    "pickTitle": "Виберіть дату"
   },
   "tabs": {
     "menu": "Меню",

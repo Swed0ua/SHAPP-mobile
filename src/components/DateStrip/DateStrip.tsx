@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { useRouter } from "expo-router";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FlatList,
@@ -10,6 +11,7 @@ import {
   View,
 } from "react-native";
 
+import { useCalendarStore } from "../../store";
 import { useTheme } from "../../theme";
 import {
   CARD_GAP,
@@ -24,143 +26,149 @@ import { SelectedDateLabel } from "./SelectedDateLabel";
 import type { CalendarDay } from "./types";
 
 export interface DateStripProps {
-  /** Initially selected day id (defaults to today). */
-  readonly initialSelectedId?: string;
+  /** Notified whenever the selected day changes. */
   readonly onChangeSelected?: (id: string) => void;
 }
 
-export const DateStrip = memo<DateStripProps>(
-  ({ initialSelectedId, onChangeSelected }) => {
-    const { theme } = useTheme();
-    const { t } = useTranslation("common");
-    const listRef = useRef<FlatList<CalendarDay>>(null);
+export const DateStrip = memo<DateStripProps>(({ onChangeSelected }) => {
+  const { theme } = useTheme();
+  const { t } = useTranslation("common");
+  const router = useRouter();
+  const listRef = useRef<FlatList<CalendarDay>>(null);
 
-    const days = useMemo(() => buildMockDays(), []);
-    const todayIdValue = useMemo(() => todayId(), []);
-    const [selectedId, setSelectedId] = useState(
-      () => initialSelectedId ?? todayIdValue,
-    );
+  const selectedId = useCalendarStore((state) => state.selectedId);
+  const setSelectedId = useCalendarStore((state) => state.setSelectedId);
 
-    const selectedIndex = useMemo(
-      () => days.findIndex((day) => day.id === selectedId),
-      [days, selectedId],
-    );
-    const initialScrollIndex = Math.max(0, selectedIndex - INITIAL_LEADING_DAYS);
-    const isTodaySelected = selectedId === todayIdValue;
+  const days = useMemo(() => buildMockDays(), []);
+  const todayIdValue = useMemo(() => todayId(), []);
 
-    const handleSelect = useCallback(
-      (id: string) => {
-        setSelectedId(id);
-        onChangeSelected?.(id);
-      },
-      [onChangeSelected],
-    );
+  const selectedIndex = useMemo(
+    () => days.findIndex((day) => day.id === selectedId),
+    [days, selectedId],
+  );
+  const initialScrollIndex = Math.max(0, selectedIndex - INITIAL_LEADING_DAYS);
+  const isTodaySelected = selectedId === todayIdValue;
 
-    const handleDateLabelPress = useCallback(() => {
-      // Placeholder: a date picker / calendar modal will be wired here later.
-    }, []);
+  const scrollToIndex = useCallback((index: number) => {
+    if (index < 0) {
+      return;
+    }
+    listRef.current?.scrollToOffset({
+      offset: CARD_STRIDE * Math.max(0, index - INITIAL_LEADING_DAYS),
+      animated: true,
+    });
+  }, []);
 
-    const handleGoToToday = useCallback(() => {
-      const todayIndex = days.findIndex((day) => day.isToday);
-      setSelectedId(todayIdValue);
-      onChangeSelected?.(todayIdValue);
-      if (todayIndex >= 0) {
-        listRef.current?.scrollToOffset({
-          offset: CARD_STRIDE * Math.max(0, todayIndex - INITIAL_LEADING_DAYS),
-          animated: true,
-        });
-      }
-    }, [days, onChangeSelected, todayIdValue]);
+  // Keep the selected day visible when it changes (e.g. picked in the modal).
+  useEffect(() => {
+    scrollToIndex(selectedIndex);
+  }, [scrollToIndex, selectedIndex]);
 
-    const renderItem = useCallback<ListRenderItem<CalendarDay>>(
-      ({ item }) => (
-        <DayCard
-          day={item}
-          isSelected={item.id === selectedId}
-          onSelect={handleSelect}
-        />
-      ),
-      [handleSelect, selectedId],
-    );
+  const handleSelect = useCallback(
+    (id: string) => {
+      setSelectedId(id);
+      onChangeSelected?.(id);
+    },
+    [onChangeSelected, setSelectedId],
+  );
 
-    const getItemLayout = useCallback(
-      (_: ArrayLike<CalendarDay> | null | undefined, index: number) => ({
-        length: CARD_WIDTH,
-        offset: CARD_STRIDE * index,
-        index,
-      }),
-      [],
-    );
+  const handleDateLabelPress = useCallback(() => {
+    router.push("/calendar");
+  }, [router]);
 
-    const handleScrollToIndexFailed = useCallback(
-      (info: { index: number }) => {
-        listRef.current?.scrollToOffset({
-          offset: CARD_STRIDE * info.index,
-          animated: false,
-        });
-      },
-      [],
-    );
+  const handleGoToToday = useCallback(() => {
+    setSelectedId(todayIdValue);
+    onChangeSelected?.(todayIdValue);
+  }, [onChangeSelected, setSelectedId, todayIdValue]);
 
-    return (
-      <View>
-        <FlatList
-          ref={listRef}
-          data={days}
-          horizontal
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          getItemLayout={getItemLayout}
-          initialScrollIndex={initialScrollIndex}
-          onScrollToIndexFailed={handleScrollToIndexFailed}
-          showsHorizontalScrollIndicator={false}
-          ItemSeparatorComponent={Separator}
-          contentContainerStyle={[
-            styles.content,
-            { paddingHorizontal: theme.spacing.lg },
-          ]}
-        />
+  const renderItem = useCallback<ListRenderItem<CalendarDay>>(
+    ({ item }) => (
+      <DayCard
+        day={item}
+        isSelected={item.id === selectedId}
+        onSelect={handleSelect}
+      />
+    ),
+    [handleSelect, selectedId],
+  );
 
-        <View style={[styles.footer, { marginTop: theme.spacing.sm }]}>
-          {!isTodaySelected ? (
-            <Pressable
-              accessibilityRole="button"
-              hitSlop={8}
-              onPress={handleGoToToday}
-              style={({ pressed }) => [
-                styles.goToToday,
-                { right: theme.spacing.sm },
-                pressed && styles.pressed,
+  const getItemLayout = useCallback(
+    (_: ArrayLike<CalendarDay> | null | undefined, index: number) => ({
+      length: CARD_WIDTH,
+      offset: CARD_STRIDE * index,
+      index,
+    }),
+    [],
+  );
+
+  const handleScrollToIndexFailed = useCallback(
+    (info: { index: number }) => {
+      listRef.current?.scrollToOffset({
+        offset: CARD_STRIDE * info.index,
+        animated: false,
+      });
+    },
+    [],
+  );
+
+  return (
+    <View>
+      <FlatList
+        ref={listRef}
+        data={days}
+        horizontal
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        getItemLayout={getItemLayout}
+        initialScrollIndex={initialScrollIndex}
+        onScrollToIndexFailed={handleScrollToIndexFailed}
+        showsHorizontalScrollIndicator={false}
+        ItemSeparatorComponent={Separator}
+        contentContainerStyle={[
+          styles.content,
+          { paddingHorizontal: theme.spacing.lg },
+        ]}
+      />
+
+      <View style={[styles.footer, { marginTop: theme.spacing.sm }]}>
+        {!isTodaySelected ? (
+          <Pressable
+            accessibilityRole="button"
+            hitSlop={8}
+            onPress={handleGoToToday}
+            style={({ pressed }) => [
+              styles.goToToday,
+              { right: theme.spacing.sm },
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text
+              style={[
+                styles.goToTodayText,
+                { color: theme.colors.content.secondary },
               ]}
             >
-              <Text
-                style={[
-                  styles.goToTodayText,
-                  { color: theme.colors.content.secondary },
-                ]}
-              >
-                {t("calendar.goToToday")}
-              </Text>
-              <Ionicons
-                name="arrow-forward"
-                size={14}
-                color={theme.colors.content.secondary}
-                style={styles.goToTodayIcon}
-              />
-            </Pressable>
-          ) : null}
-
-          <View style={styles.dateLabel}>
-            <SelectedDateLabel
-              selectedId={selectedId}
-              onPress={handleDateLabelPress}
+              {t("calendar.goToToday")}
+            </Text>
+            <Ionicons
+              name="arrow-forward"
+              size={14}
+              color={theme.colors.content.secondary}
+              style={styles.goToTodayIcon}
             />
-          </View>
+          </Pressable>
+        ) : null}
+
+        <View style={styles.dateLabel}>
+          <SelectedDateLabel
+            selectedId={selectedId}
+            onPress={handleDateLabelPress}
+          />
         </View>
       </View>
-    );
-  },
-);
+    </View>
+  );
+});
 
 DateStrip.displayName = "DateStrip";
 
@@ -177,7 +185,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footer: {
-    height: GO_TO_TODAY_SLOT_HEIGHT * 3,
+    height: GO_TO_TODAY_SLOT_HEIGHT * 2.5,
     position: "relative",
   },
   dateLabel: {

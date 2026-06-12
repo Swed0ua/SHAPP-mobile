@@ -55,6 +55,7 @@ export default function RootLayout() {
         >
           <Stack.Screen name="index" options={{ title: "Home" }} />
           <Stack.Screen name="profile" options={{ title: "Profile" }} />
+          <Stack.Screen name="calendar" options={{ presentation: "modal" }} />
         </Stack>
         <AppBottomNavBar />
         <StatusBar style={theme.mode === "dark" ? "light" : "dark"} />

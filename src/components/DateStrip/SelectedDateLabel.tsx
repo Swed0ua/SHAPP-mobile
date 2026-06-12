@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text } from "react-native";
 
 import { useTheme } from "../../theme";
+import { parseDateId, startOfDay } from "../../utils/date";
 
 interface SelectedDateLabelProps {
   /** Selected day id (YYYY-MM-DD). */
@@ -13,17 +14,6 @@ interface SelectedDateLabelProps {
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-function parseLocalDate(id: string): Date {
-  const [year, month, day] = id.split("-").map(Number);
-  return new Date(year, month - 1, day);
-}
-
-function startOfToday(): Date {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  return now;
-}
-
 export const SelectedDateLabel = memo<SelectedDateLabelProps>(
   ({ selectedId, onPress }) => {
     const { theme } = useTheme();
@@ -31,9 +21,9 @@ export const SelectedDateLabel = memo<SelectedDateLabelProps>(
 
     const label = useMemo(() => {
       const locale = i18n.language;
-      const date = parseLocalDate(selectedId);
+      const date = parseDateId(selectedId);
       const diffDays = Math.round(
-        (date.getTime() - startOfToday().getTime()) / MS_PER_DAY,
+        (date.getTime() - startOfDay(new Date()).getTime()) / MS_PER_DAY,
       );
 
       let lead: string;
@@ -84,7 +74,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "400",
     letterSpacing: 0.5,
   },
 });

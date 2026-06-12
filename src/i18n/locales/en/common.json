@@ -24,7 +24,8 @@
     "goToToday": "Back to today",
     "today": "Today",
     "yesterday": "Yesterday",
-    "tomorrow": "Tomorrow"
+    "tomorrow": "Tomorrow",
+    "pickTitle": "Select date"
   },
   "tabs": {
     "menu": "Menu",
