@@ -27,6 +27,14 @@
     "tomorrow": "Tomorrow",
     "pickTitle": "Select date"
   },
+  "nutrients": {
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "fiber": "Fiber",
+    "sugar": "Sugar",
+    "sodium": "Sodium"
+  },
   "tabs": {
     "menu": "Menu",
     "home": "Home",

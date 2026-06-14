@@ -1,6 +1,7 @@
 import { StyleSheet, View } from "react-native";
 
 import { DateStrip } from "../src/components/DateStrip";
+import { mockNutrients, NutrientBlock } from "../src/components/NutrientBlock";
 import { ProgressRing } from "../src/components/ProgressRing";
 import { useTheme } from "../src/theme";
 
@@ -21,6 +22,10 @@ export default function HomeScreen() {
       <View style={styles.ring}>
         <ProgressRing value={1110} target={2200} />
       </View>
+
+      <View style={styles.nutrients}>
+        <NutrientBlock items={mockNutrients} />
+      </View>
     </View>
   );
 }
@@ -33,8 +38,12 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   ring: {
-    flex: 1,
+    // flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  nutrients: {
+    paddingHorizontal: 16,
+    paddingBottom: 32,
   },
 });
