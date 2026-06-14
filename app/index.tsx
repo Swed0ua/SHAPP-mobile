@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   ring: {
     // flex: 1,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   nutrients: {
     paddingHorizontal: 16,
