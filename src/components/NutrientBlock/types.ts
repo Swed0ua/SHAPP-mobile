@@ -16,5 +16,4 @@ export interface NutrientStat {
   readonly consumed: number;
   readonly goal: number;
   readonly unit: string;
-  readonly color: string;
 }

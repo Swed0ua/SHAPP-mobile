@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { type DimensionValue, StyleSheet, View, type ViewStyle } from "react-native";
 
 import { StatRing } from "../StatRing";
+import { getNutrientColor } from "./nutrientColors";
 import type { NutrientStat } from "./types";
 
 export interface NutrientBlockProps {
@@ -65,7 +66,7 @@ export const NutrientBlock = memo<NutrientBlockProps>(({ items }) => {
             label={t(`nutrients.${nutrient.id}`)}
             value={`${nutrient.consumed}${nutrient.unit}`}
             progress={nutrient.goal > 0 ? nutrient.consumed / nutrient.goal : 0}
-            color={nutrient.color}
+            color={getNutrientColor(nutrient.id)}
           />
         </View>
       ))}
