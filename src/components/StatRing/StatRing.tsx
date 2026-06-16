@@ -86,13 +86,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   value: {
-    marginTop: 2,
-    fontSize: 16,
+    marginTop: 1,
+    fontSize: 14,
     fontWeight: "700",
     letterSpacing: 0.5,
   },
   label: {
-    marginTop: 2,
+    marginTop: 1,
     fontSize: 11,
     fontWeight: "500",
   },

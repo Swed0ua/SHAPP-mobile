@@ -14,7 +14,7 @@ export interface NutrientBlockProps {
 export const NutrientBlock = memo<NutrientBlockProps>(({ items }) => {
   const { t } = useTranslation("common");
 
-  const [columns] = useState(4);
+  const [columns] = useState(6);
 
   const getItemStyle = (
     _index: number,
@@ -25,16 +25,32 @@ export const NutrientBlock = memo<NutrientBlockProps>(({ items }) => {
       width,
     };
 
-    if (columnsCount === 4) {
-      if ([0, 3, 4, 5].includes(_index)) {
-        styleDict.marginTop= "-30" as DimensionValue;
-      }
-      if ([4].includes(_index)) {
-        styleDict.marginLeft= "30" as DimensionValue;
-      }
-      if ([5].includes(_index)) {
-        styleDict.marginRight= "30" as DimensionValue;
-      }
+    switch (columnsCount) {
+      case 4:
+        if ([0, 3, 4, 5].includes(_index)) {
+          styleDict.marginTop= "-30" as DimensionValue;
+        }
+        if ([4].includes(_index)) {
+          styleDict.marginLeft= "30" as DimensionValue;
+        }
+        if ([5].includes(_index)) {
+          styleDict.marginRight= "30" as DimensionValue;
+        }
+        break;
+      case 6:
+        if ([1, 4].includes(_index)) {
+          styleDict.marginTop= "-30" as DimensionValue;
+        }
+        if ([0, 5].includes(_index)) {
+          styleDict.marginTop= "-80" as DimensionValue;
+          if (_index === 0) {
+            styleDict.marginLeft= "-10" as DimensionValue;
+          }
+          if (_index === 5) {
+            styleDict.marginRight= "-10" as DimensionValue;
+          }
+        }
+        break;
     }
 
     return styleDict;
@@ -65,6 +81,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     rowGap: 10,
+    paddingTop: 40
   },
   cell: {
     alignItems: "center",

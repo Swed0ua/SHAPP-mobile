@@ -38,12 +38,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   ring: {
-    // flex: 1,
+    flex: 1,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    // paddingTop: 30
   },
   nutrients: {
     paddingHorizontal: 16,
-    paddingBottom: 32,
+    paddingBottom: 180,
   },
 });
