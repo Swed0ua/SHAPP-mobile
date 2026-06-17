@@ -1,16 +1,19 @@
 import { useMemo } from "react";
-import { ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { DateStrip } from "../src/components/DateStrip";
 import { mockNutrients, NutrientBlock } from "../src/components/NutrientBlock";
 import { ProgressRing } from "../src/components/ProgressRing";
+import { RING_SIZE } from "../src/components/ProgressRing/constants";
+import { SideStat } from "../src/components/SideStat";
 import { useTheme } from "../src/theme";
 
 const MOCK_CALORIES = { consumed: 1110, target: 2200 } as const;
+const MOCK_BURNED_CALORIES = { value: 320, unit: "ккал" } as const;
+const MOCK_WATER = { value: 2.1, unit: "л" } as const;
 
 export default function HomeScreen() {
   const { theme } = useTheme();
-  const { height: screenHeight } = useWindowDimensions();
 
   const styles = useMemo(
     () =>
@@ -19,9 +22,7 @@ export default function HomeScreen() {
           flex: 1,
           backgroundColor: theme.colors.background.canvas,
         },
-        mainContent: {
-
-        },
+        mainContent: {},
         dateStrip: {
           paddingVertical: theme.spacing.lg,
         },
@@ -31,13 +32,20 @@ export default function HomeScreen() {
           justifyContent: "center",
           paddingTop: theme.spacing.xxl,
         },
+        progressInner: {
+          width: RING_SIZE,
+          height: RING_SIZE,
+          position: "relative",
+          alignItems: "center",
+          justifyContent: "center",
+        },
         nutrients: {
-          paddingHorizontal: theme.spacing.md,
+          paddingHorizontal: 4,
           paddingTop: theme.spacing.xxl,
-          paddingBottom:  theme.spacing.xxl * 3,
+          paddingBottom: theme.spacing.xxl * 3,
         },
       }),
-    [theme, screenHeight],
+    [theme],
   );
 
   return (
@@ -48,17 +56,31 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.progress}>
-          <ProgressRing
-            value={MOCK_CALORIES.consumed}
-            target={MOCK_CALORIES.target}
-          />
+          <View style={styles.progressInner}>
+            <ProgressRing
+              value={MOCK_CALORIES.consumed}
+              target={MOCK_CALORIES.target}
+            />
+
+            <SideStat
+              icon="water-outline"
+              value={MOCK_WATER.value}
+              unit={MOCK_WATER.unit}
+              side="left"
+            />
+            <SideStat
+              icon="walk-outline"
+              value={MOCK_BURNED_CALORIES.value}
+              unit={MOCK_BURNED_CALORIES.unit}
+              side="right"
+            />
+          </View>
         </View>
 
         <View style={styles.nutrients}>
           <NutrientBlock items={mockNutrients} />
         </View>
       </View>
-      {/* <View style={[{height: 700, backgroundColor: "red"}]}></View> */}
     </ScrollView>
   );
 }
