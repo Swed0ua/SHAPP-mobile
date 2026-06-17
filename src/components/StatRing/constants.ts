@@ -3,6 +3,9 @@
 export const STAT_RING_SIZE = 64;
 export const STAT_RING_RADIUS = 22;
 
+/** Max width for value + label so long names truncate cleanly in tight grids. */
+export const STAT_RING_CAPTION_WIDTH = STAT_RING_SIZE + 20;
+
 export const STAT_RING_STROKE_WIDTH = 6;
 export const STAT_RING_TRACK_STROKE_WIDTH = 6;
 

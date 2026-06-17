@@ -2,12 +2,12 @@ import type { NutrientId } from "./types";
 
 /** Presentation colors per nutrient — UI concern, not part of domain data. */
 const NUTRIENT_COLORS: Record<NutrientId, string> = {
-  protein: "#00D1FF",
-  carbs: "#B6FF00",
-  fat: "#FFB800",
-  fiber: "#39FF14",
-  sugar: "#FF3D81",
-  sodium: "#4DA6FF",
+  protein: "#5DAFD1",
+  carbs: "#98B848",
+  fat: "#C9A24D",
+  fiber: "#6EAD72",
+  sugar: "#BF6B92",
+  sodium: "#7299C4",
 };
 
 export function getNutrientColor(id: NutrientId): string {

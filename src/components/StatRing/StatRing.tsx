@@ -5,6 +5,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { GlowRing } from "../GlowRing";
 import { useTheme } from "../../theme";
 import {
+  STAT_RING_CAPTION_WIDTH,
   STAT_RING_GLOW_BLUR,
   STAT_RING_GLOW_DOT_COUNT,
   STAT_RING_GLOW_DOT_SIZE,
@@ -62,18 +63,31 @@ export const StatRing = memo<StatRingProps>(
           <Ionicons name={icon} size={STAT_RING_ICON_SIZE} color={color} />
         </GlowRing>
 
-        <Text
-          style={[styles.value, { color: theme.colors.content.primary }]}
-          numberOfLines={1}
-        >
-          {value}
-        </Text>
-        <Text
-          style={[styles.label, { color: theme.colors.content.secondary }]}
-          numberOfLines={1}
-        >
-          {label}
-        </Text>
+        <View style={[styles.caption, { maxWidth: STAT_RING_CAPTION_WIDTH }]}>
+          <Text
+            style={[styles.value, { color: theme.colors.content.primary }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.85}
+          >
+            {value}
+          </Text>
+          <View
+            style={[
+              styles.labelPill,
+              { backgroundColor: `${color}22` },
+            ]}
+          >
+            <Text
+              style={[styles.label, { color }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+            >
+              {label.toUpperCase()}
+            </Text>
+          </View>
+        </View>
       </View>
     );
   },
@@ -85,15 +99,27 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
   },
+  caption: {
+    alignItems: "center",
+    marginTop: 6,
+  },
   value: {
-    marginTop: 1,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
+    textAlign: "center",
+  },
+  labelPill: {
+    marginTop: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    maxWidth: "100%",
   },
   label: {
-    marginTop: 1,
-    fontSize: 11,
-    fontWeight: "500",
+    fontSize: 9,
+    fontWeight: "600",
+    letterSpacing: 1.2,
+    textAlign: "center",
   },
 });

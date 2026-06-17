@@ -40,16 +40,16 @@ export const NutrientBlock = memo<NutrientBlockProps>(({ items }) => {
         break;
       case 6:
         if ([1, 4].includes(_index)) {
-          styleDict.marginTop= "-30" as DimensionValue;
+          styleDict.marginTop= "-26" as DimensionValue;
         }
         if ([0, 5].includes(_index)) {
-          styleDict.marginTop= "-80" as DimensionValue;
-          if (_index === 0) {
-            styleDict.marginLeft= "-10" as DimensionValue;
-          }
-          if (_index === 5) {
-            styleDict.marginRight= "-10" as DimensionValue;
-          }
+          styleDict.marginTop= "-74" as DimensionValue;
+          // if (_index === 0) {
+          //   styleDict.marginRight= "-0" as DimensionValue;
+          // }
+          // if (_index === 5) {
+          //   styleDict.marginLeft= "-0" as DimensionValue;
+          // }
         }
         break;
     }
@@ -82,7 +82,6 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     rowGap: 10,
-    paddingTop: 40
   },
   cell: {
     alignItems: "center",
