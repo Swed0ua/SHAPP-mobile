@@ -52,6 +52,7 @@ export const StatRing = memo<StatRingProps>(
           progressStrokeWidth={STAT_RING_STROKE_WIDTH}
           trackStrokeWidth={STAT_RING_TRACK_STROKE_WIDTH}
           startAngle={STAT_RING_START_ANGLE}
+          pulseProgressStroke={progress > 1}
           glow={{
             dotSize: STAT_RING_GLOW_DOT_SIZE,
             dotCount: STAT_RING_GLOW_DOT_COUNT,

@@ -6,6 +6,6 @@ export const mockNutrients: readonly NutrientStat[] = [
   { id: "carbs", icon: "nutrition", consumed: 180, goal: 260, unit: "g" },
   { id: "fat", icon: "water", consumed: 44, goal: 70, unit: "g" },
   { id: "fiber", icon: "leaf", consumed: 18, goal: 30, unit: "g" },
-  { id: "sugar", icon: "ice-cream", consumed: 42, goal: 50, unit: "g" },
+  { id: "sugar", icon: "ice-cream", consumed: 142, goal: 50, unit: "g" },
   { id: "sodium", icon: "flask", consumed: 1500, goal: 2300, unit: "mg" },
 ];

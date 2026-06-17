@@ -1,8 +1,23 @@
-import { memo, type ReactNode } from "react";
+import { memo, useEffect, type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
+import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedProps,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 import Svg, { Circle, G } from "react-native-svg";
 
 import { clamp } from "../../utils/progressColor";
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+const PROGRESS_PULSE_MIN_OPACITY = 0.4;
+const PROGRESS_PULSE_DURATION_MS = 800;
 
 export interface GlowRingTicks {
   /** Number of evenly spaced ticks around the track. */
@@ -35,6 +50,8 @@ export interface GlowRingProps {
   readonly startAngle?: number;
   /** When provided, the track is drawn as ticks instead of a solid line. */
   readonly ticks?: GlowRingTicks;
+  /** Gentle opacity pulse on the progress arc (e.g. when fill exceeds 100%). */
+  readonly pulseProgressStroke?: boolean;
   /** Centered content (icon, value, pill, etc.). */
   readonly children?: ReactNode;
 }
@@ -57,12 +74,39 @@ export const GlowRing = memo<GlowRingProps>(
     glow,
     startAngle = -90,
     ticks,
+    pulseProgressStroke = false,
     children,
   }) => {
     const ratio = clamp(progress, 0, 1);
     const center = size / 2;
     const circumference = 2 * Math.PI * radius;
     const progressLength = circumference * ratio;
+
+    const progressStrokeOpacity = useSharedValue(1);
+
+    useEffect(() => {
+      if (pulseProgressStroke) {
+        progressStrokeOpacity.value = withRepeat(
+          withSequence(
+            withDelay(PROGRESS_PULSE_DURATION_MS*3, withTiming(1, { duration: 0 })),           
+            withTiming(PROGRESS_PULSE_MIN_OPACITY, { duration: PROGRESS_PULSE_DURATION_MS*0.4, easing: Easing.out(Easing.cubic) }), 
+            withTiming(1, { duration: PROGRESS_PULSE_DURATION_MS, easing: Easing.in(Easing.cubic) }),  
+          ),
+          -1,
+          true,
+        );
+        return () => {
+          cancelAnimation(progressStrokeOpacity);
+        };
+      }
+
+      cancelAnimation(progressStrokeOpacity);
+      progressStrokeOpacity.value = withTiming(1, { duration: 200 });
+    }, [pulseProgressStroke, progressStrokeOpacity]);
+
+    const animatedProgressProps = useAnimatedProps(() => ({
+      strokeOpacity: progressStrokeOpacity.value,
+    }));
 
     const trackDash = ticks
       ? [ticks.length, Math.max(circumference / ticks.count - ticks.length, 0)]
@@ -113,7 +157,8 @@ export const GlowRing = memo<GlowRingProps>(
             fill="none"
           />
           <G originX={center} originY={center} rotation={startAngle}>
-            <Circle
+            <AnimatedCircle
+              animatedProps={animatedProgressProps}
               cx={center}
               cy={center}
               r={radius}
