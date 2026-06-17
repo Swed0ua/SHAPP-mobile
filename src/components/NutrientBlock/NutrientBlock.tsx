@@ -43,13 +43,7 @@ export const NutrientBlock = memo<NutrientBlockProps>(({ items }) => {
           styleDict.marginTop= "-26" as DimensionValue;
         }
         if ([0, 5].includes(_index)) {
-          styleDict.marginTop= "-74" as DimensionValue;
-          // if (_index === 0) {
-          //   styleDict.marginRight= "-0" as DimensionValue;
-          // }
-          // if (_index === 5) {
-          //   styleDict.marginLeft= "-0" as DimensionValue;
-          // }
+          styleDict.marginTop= "-64" as DimensionValue;
         }
         break;
     }

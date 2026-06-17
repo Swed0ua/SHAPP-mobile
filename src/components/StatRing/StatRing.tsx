@@ -64,14 +64,6 @@ export const StatRing = memo<StatRingProps>(
         </GlowRing>
 
         <View style={[styles.caption, { maxWidth: STAT_RING_CAPTION_WIDTH }]}>
-          <Text
-            style={[styles.value, { color: theme.colors.content.primary }]}
-            numberOfLines={1}
-            adjustsFontSizeToFit
-            minimumFontScale={0.85}
-          >
-            {value}
-          </Text>
           <View
             style={[
               styles.labelPill,
@@ -87,6 +79,14 @@ export const StatRing = memo<StatRingProps>(
               {label.toUpperCase()}
             </Text>
           </View>
+          <Text
+            style={[styles.value, { color: theme.colors.content.primary }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.85}
+          >
+            {value}
+          </Text>
         </View>
       </View>
     );
@@ -104,13 +104,14 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   value: {
-    fontSize: 13,
+    marginTop: 4,
+    fontSize: 10,
     fontWeight: "700",
     letterSpacing: 0.3,
     textAlign: "center",
+    opacity: 0.4,
   },
   labelPill: {
-    marginTop: 4,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
