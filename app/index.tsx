@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { StyleSheet, useWindowDimensions, View } from "react-native";
+import { ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 
 import { DateStrip } from "../src/components/DateStrip";
 import { mockNutrients, NutrientBlock } from "../src/components/NutrientBlock";
@@ -7,7 +7,6 @@ import { ProgressRing } from "../src/components/ProgressRing";
 import { useTheme } from "../src/theme";
 
 const MOCK_CALORIES = { consumed: 1110, target: 2200 } as const;
-const NUTRIENTS_BOTTOM_INSET = 250;
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -21,7 +20,7 @@ export default function HomeScreen() {
           backgroundColor: theme.colors.background.canvas,
         },
         mainContent: {
-          minHeight: screenHeight,
+
         },
         dateStrip: {
           paddingVertical: theme.spacing.lg,
@@ -30,17 +29,19 @@ export default function HomeScreen() {
           flex: 1,
           alignItems: "center",
           justifyContent: "center",
+          paddingTop: theme.spacing.xxl,
         },
         nutrients: {
-          paddingHorizontal: theme.spacing.lg,
-          paddingBottom: NUTRIENTS_BOTTOM_INSET,
+          paddingHorizontal: theme.spacing.md,
+          paddingTop: theme.spacing.xxl,
+          paddingBottom:  theme.spacing.xxl * 3,
         },
       }),
     [theme, screenHeight],
   );
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.mainContent}>
         <View style={styles.dateStrip}>
           <DateStrip />
@@ -57,6 +58,7 @@ export default function HomeScreen() {
           <NutrientBlock items={mockNutrients} />
         </View>
       </View>
-    </View>
+      {/* <View style={[{height: 700, backgroundColor: "red"}]}></View> */}
+    </ScrollView>
   );
 }
