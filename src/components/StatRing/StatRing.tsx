@@ -40,6 +40,10 @@ export interface StatRingProps {
 export const StatRing = memo<StatRingProps>(
   ({ icon, label, value, progress, color }) => {
     const { theme } = useTheme();
+    const isOverGoal = progress > 1;
+    const valueColor = isOverGoal
+      ? theme.colors.status.danger
+      : theme.colors.content.primary;
 
     return (
       <View style={styles.container}>
@@ -81,7 +85,11 @@ export const StatRing = memo<StatRingProps>(
             </Text>
           </View>
           <Text
-            style={[styles.value, { color: theme.colors.content.primary }]}
+            style={[
+              styles.value,
+              { color: valueColor },
+              isOverGoal && styles.valueOverGoal,
+            ]}
             numberOfLines={1}
             adjustsFontSizeToFit
             minimumFontScale={0.85}
@@ -111,6 +119,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
     textAlign: "center",
     opacity: 0.4,
+  },
+  valueOverGoal: {
+    opacity: 1,
   },
   labelPill: {
     paddingHorizontal: 6,
