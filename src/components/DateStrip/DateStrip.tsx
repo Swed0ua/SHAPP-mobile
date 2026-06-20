@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 
-import { useCalendarStore } from "../../store";
+import { useCalendarStore, useUserGoalsStore } from "../../store";
 import { useTheme } from "../../theme";
 import { parseDateId } from "../../utils/date";
 import {
@@ -40,6 +40,7 @@ export const DateStrip = memo<DateStripProps>(({ onChangeSelected }) => {
 
   const selectedId = useCalendarStore((state) => state.selectedId);
   const setSelectedId = useCalendarStore((state) => state.setSelectedId);
+  const caloriesTarget = useUserGoalsStore((state) => state.goals.calories);
 
   const todayIdValue = useMemo(() => todayId(), []);
 
@@ -48,8 +49,8 @@ export const DateStrip = memo<DateStripProps>(({ onChangeSelected }) => {
   const [anchorId, setAnchorId] = useState(selectedId);
 
   const days = useMemo(
-    () => buildMockDays(parseDateId(anchorId)),
-    [anchorId],
+    () => buildMockDays(parseDateId(anchorId), new Date(), caloriesTarget),
+    [anchorId, caloriesTarget],
   );
 
   const selectedIndex = useMemo(

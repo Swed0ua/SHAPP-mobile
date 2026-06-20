@@ -16,8 +16,8 @@ import { clamp } from "../../utils/progressColor";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const PROGRESS_PULSE_MIN_OPACITY = 0.4;
-const PROGRESS_PULSE_DURATION_MS = 800;
+const PROGRESS_PULSE_MIN_OPACITY = 0.3;
+const PROGRESS_PULSE_DURATION_MS = 1000;
 
 export interface GlowRingTicks {
   /** Number of evenly spaced ticks around the track. */
@@ -86,14 +86,15 @@ export const GlowRing = memo<GlowRingProps>(
 
     useEffect(() => {
       if (pulseProgressStroke) {
+        const pulseDuration = PROGRESS_PULSE_DURATION_MS*3 + Math.random()*1000;
         progressStrokeOpacity.value = withRepeat(
           withSequence(
-            withDelay(PROGRESS_PULSE_DURATION_MS*3, withTiming(1, { duration: 0 })),           
-            withTiming(PROGRESS_PULSE_MIN_OPACITY, { duration: PROGRESS_PULSE_DURATION_MS*0.4, easing: Easing.out(Easing.cubic) }), 
-            withTiming(1, { duration: PROGRESS_PULSE_DURATION_MS, easing: Easing.in(Easing.cubic) }),  
+            withDelay(pulseDuration, withTiming(1, { duration: 0 })),           
+            withTiming(PROGRESS_PULSE_MIN_OPACITY, { duration: PROGRESS_PULSE_DURATION_MS*0.5, easing: Easing.out(Easing.cubic) }), 
+            withTiming(1, { duration: PROGRESS_PULSE_DURATION_MS*0.7 , easing: Easing.in(Easing.cubic) }),  
           ),
           -1,
-          true,
+          false,
         );
         return () => {
           cancelAnimation(progressStrokeOpacity);

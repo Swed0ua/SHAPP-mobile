@@ -9,6 +9,15 @@ export type NutrientId =
   | "sugar"
   | "sodium";
 
+export const NUTRIENT_IDS: readonly NutrientId[] = [
+  "protein",
+  "carbs",
+  "fat",
+  "fiber",
+  "sugar",
+  "sodium",
+];
+
 export interface NutrientStat {
   /** Stable id; also used to resolve the localized label (`nutrients.<id>`). */
   readonly id: NutrientId;

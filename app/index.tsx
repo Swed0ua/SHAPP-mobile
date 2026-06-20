@@ -2,18 +2,16 @@ import { useMemo } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { DateStrip } from "../src/components/DateStrip";
-import { mockNutrients, NutrientBlock } from "../src/components/NutrientBlock";
+import { NutrientBlock } from "../src/components/NutrientBlock";
 import { ProgressRing } from "../src/components/ProgressRing";
 import { RING_SIZE } from "../src/components/ProgressRing/constants";
 import { SideStat } from "../src/components/SideStat";
+import { useSelectedDay } from "../src/hooks/useSelectedDay";
 import { useTheme } from "../src/theme";
-
-const MOCK_CALORIES = { consumed: 1110, target: 2200 } as const;
-const MOCK_BURNED_CALORIES = { value: 320, unit: "ккал" } as const;
-const MOCK_WATER = { value: 2.1, unit: "л" } as const;
 
 export default function HomeScreen() {
   const { theme } = useTheme();
+  const { day, goals, nutrients } = useSelectedDay();
 
   const styles = useMemo(
     () =>
@@ -58,27 +56,27 @@ export default function HomeScreen() {
         <View style={styles.progress}>
           <View style={styles.progressInner}>
             <ProgressRing
-              value={MOCK_CALORIES.consumed}
-              target={MOCK_CALORIES.target}
+              value={day?.calories ?? 0}
+              target={goals.calories}
             />
 
             <SideStat
               icon="water-outline"
-              value={MOCK_WATER.value}
-              unit={MOCK_WATER.unit}
+              value={day?.water ?? 0}
+              unit="л"
               side="left"
             />
             <SideStat
               icon="walk-outline"
-              value={MOCK_BURNED_CALORIES.value}
-              unit={MOCK_BURNED_CALORIES.unit}
+              value={day?.burnedCalories ?? 0}
+              unit="ккал"
               side="right"
             />
           </View>
         </View>
 
         <View style={styles.nutrients}>
-          <NutrientBlock items={mockNutrients} />
+          <NutrientBlock items={nutrients} />
         </View>
       </View>
     </ScrollView>
