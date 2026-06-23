@@ -85,6 +85,7 @@
       "portion": "Порція ({{amount}} {{unit}})",
       "large": "Велика порція ({{amount}} {{unit}})",
       "default": "{{amount}} {{unit}}"
-    }
+    },
+    "perServingFacts": "На {{amount}} {{unit}}: {{calories}} ккал · Б {{protein}} · Ж {{fat}} · В {{carbs}}"
   }
 }

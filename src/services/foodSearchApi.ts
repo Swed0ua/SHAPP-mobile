@@ -20,6 +20,8 @@ const FOOD_CATALOG: readonly FoodItem[] = [
       sugar: 1,
       sodium: 5,
     },
+    description: "Цільнозернова каша з високим вмістом клітковини — класика сніданку.",
+    details: "Крупи · Без добавок · Еталон 100 г",
   },
   {
     id: "shapp:2",
@@ -38,6 +40,8 @@ const FOOD_CATALOG: readonly FoodItem[] = [
       sugar: 0,
       sodium: 74,
     },
+    description: "Нежирне джерело білка — ідеально для основних страв.",
+    details: "М'ясо птиці · Низький жир · 31 г білка на 100 г",
   },
   {
     id: "shapp:3",
@@ -56,6 +60,8 @@ const FOOD_CATALOG: readonly FoodItem[] = [
       sugar: 0.1,
       sodium: 1,
     },
+    description: "Легкий гарнір із повільними вуглеводами.",
+    details: "Крупи · Варений · Низький жир",
   },
   {
     id: "fdc:173944",
@@ -75,6 +81,8 @@ const FOOD_CATALOG: readonly FoodItem[] = [
       sugar: 12,
       sodium: 1,
     },
+    description: "Свіжий фрукт із природною солодкістю та калієм.",
+    details: "USDA FDC · Фрукти · 12 г цукрів на 100 г",
   },
   {
     id: "shapp:5",
@@ -93,6 +101,8 @@ const FOOD_CATALOG: readonly FoodItem[] = [
       sugar: 3.6,
       sodium: 36,
     },
+    description: "Густий йогурт із підвищеним вмістом білка.",
+    details: "Молочні · 9 г білка · Помірний жир",
   },
   {
     id: "fdc:171287",
@@ -111,6 +121,8 @@ const FOOD_CATALOG: readonly FoodItem[] = [
       sugar: 1.1,
       sodium: 124,
     },
+    description: "Універсальне джерело білка та жирів для сніданку.",
+    details: "USDA FDC · Яйця · ~155 ккал на 100 г",
   },
   {
     id: "shapp:7",
@@ -129,6 +141,8 @@ const FOOD_CATALOG: readonly FoodItem[] = [
       sugar: 3,
       sodium: 320,
     },
+    description: "М'який сир із високим вмістом білка та кальцію.",
+    details: "Молочні · 17 г білка · 5% жиру",
   },
   {
     id: "shapp:8",
@@ -147,6 +161,8 @@ const FOOD_CATALOG: readonly FoodItem[] = [
       sugar: 9,
       sodium: 17,
     },
+    description: "Насіння арахісу без доданого цукру — енергійний перекус.",
+    details: "Горіхова паста · Високий жир · 25 г білка",
   },
 ];
 

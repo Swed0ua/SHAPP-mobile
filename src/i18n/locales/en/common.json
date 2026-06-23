@@ -85,6 +85,7 @@
       "portion": "Portion ({{amount}} {{unit}})",
       "large": "Large portion ({{amount}} {{unit}})",
       "default": "{{amount}} {{unit}}"
-    }
+    },
+    "perServingFacts": "Per {{amount}} {{unit}}: {{calories}} kcal · P {{protein}} · F {{fat}} · C {{carbs}}"
   }
 }

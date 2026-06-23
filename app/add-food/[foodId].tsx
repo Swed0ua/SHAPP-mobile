@@ -8,7 +8,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ItemPreview } from "../../src/components/ItemPreview";
 import { PortionLogFooter } from "../../src/components/PortionLogFooter";
 import { ScreenHeader } from "../../src/components/ScreenHeader";
-import { SelectDropdown } from "../../src/components/SelectDropdown";
+import { PopupSelect } from "../../src/components/PopupSelect";
+import { ServingInsight } from "../../src/components/ServingInsight";
 import { getFoodItemById } from "../../src/services/foodSearchApi";
 import {
   useCalendarStore,
@@ -124,6 +125,52 @@ export default function FoodPortionScreen() {
     return computePortionNutrients(food, selectedServing.amount, quantity);
   }, [food, quantity, selectedServing]);
 
+  const servingInsight = useMemo(() => {
+    if (!food || !selectedServing) {
+      return null;
+    }
+
+    const perServing = computePortionNutrients(food, selectedServing.amount, 1);
+    const unit = unitLabels[selectedServing.unit];
+
+    const highlights = [
+      {
+        label: t("nutrients.fiber"),
+        value: `${perServing.fiber ?? 0} ${unitLabels.g}`,
+      },
+      {
+        label: t("nutrients.sugar"),
+        value: `${perServing.sugar ?? 0} ${unitLabels.g}`,
+      },
+      {
+        label: t("nutrients.sodium"),
+        value: `${perServing.sodium ?? 0} mg`,
+      },
+    ];
+
+    const sourceBadge =
+      food.source === "fdc"
+        ? "USDA"
+        : food.source === "shapp"
+          ? "SHAPP"
+          : undefined;
+
+    return {
+      body: food.description,
+      detail: t("foodPortion.perServingFacts", {
+        amount: selectedServing.amount,
+        unit,
+        calories: perServing.calories,
+        protein: perServing.protein,
+        fat: perServing.fat,
+        carbs: perServing.carbs,
+      }),
+      meta: food.details,
+      highlights,
+      badge: sourceBadge ?? food.brand ?? undefined,
+    };
+  }, [food, selectedServing, t, unitLabels]);
+
   const mealType: MealType = (() => {
     const meal = params.meal ?? "";
     return isMealType(meal) ? meal : "snack";
@@ -175,12 +222,22 @@ export default function FoodPortionScreen() {
         />
 
         <View style={styles.servingSection}>
-          <SelectDropdown
+          <PopupSelect
             label={t("foodPortion.servingSection")}
             options={servingOptions}
             value={selectedServingId}
             onChange={setSelectedServingId}
           />
+
+          {servingInsight ? (
+            <ServingInsight
+              badge={servingInsight.badge}
+              body={servingInsight.body}
+              detail={servingInsight.detail}
+              meta={servingInsight.meta}
+              highlights={servingInsight.highlights}
+            />
+          ) : null}
         </View>
       </ScrollView>
 
@@ -214,5 +271,6 @@ const styles = StyleSheet.create({
   },
   servingSection: {
     marginTop: 20,
+    rowGap: 14,
   },
 });

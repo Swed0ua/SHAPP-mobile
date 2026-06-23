@@ -24,6 +24,10 @@ export type FoodItem = {
   readonly servingAmount: number;
   readonly servingUnit: ServingUnit;
   readonly nutrients: Nutrients;
+  /** Short catalog note shown on the portion screen (Food Label Maker style). */
+  readonly description?: string;
+  /** Extra catalog metadata (category, source note, etc.). */
+  readonly details?: string;
 };
 
 export type MealEntry = {
