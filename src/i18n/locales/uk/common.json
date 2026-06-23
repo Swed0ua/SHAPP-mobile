@@ -41,5 +41,50 @@
     "calendar": "Календар",
     "profile": "Профіль",
     "add": "Додати"
+  },
+  "foodAdd": {
+    "title": "Додати їжу",
+    "close": "Закрити додавання їжі",
+    "barcode": "Сканувати штрихкод",
+    "resultsTitle": "Результати пошуку",
+    "searchPlaceholder": "Пошук продуктів",
+    "searchHint": "Почни вводити назву продукту, щоб знайти його у базі.",
+    "loading": "Шукаємо продукти...",
+    "empty": "Нічого не знайдено. Спробуй інший запит.",
+    "selectedMeal": {
+      "breakfast": "Буде додано до сніданку",
+      "lunch": "Буде додано до обіду",
+      "dinner": "Буде додано до вечері",
+      "snack": "Буде додано до перекусу"
+    },
+    "meals": {
+      "now": "Зараз",
+      "breakfast": "Сніданок",
+      "lunch": "Обід",
+      "dinner": "Вечеря",
+      "snack": "Перекус"
+    },
+    "calories": "{{value}} ккал",
+    "macroLine": "Б {{protein}} • Ж {{fat}} • В {{carbs}}",
+    "servingUnits": {
+      "g": "г",
+      "ml": "мл",
+      "oz": "oz",
+      "cup": "склянка",
+      "piece": "шт"
+    }
+  },
+  "foodPortion": {
+    "title": "Порція",
+    "servingSection": "Розмір порції",
+    "quantitySection": "Кількість",
+    "add": "Додати до щоденника",
+    "presets": {
+      "1g": "{{amount}} {{unit}}",
+      "100g": "{{amount}} {{unit}}",
+      "portion": "Порція ({{amount}} {{unit}})",
+      "large": "Велика порція ({{amount}} {{unit}})",
+      "default": "{{amount}} {{unit}}"
+    }
   }
 }

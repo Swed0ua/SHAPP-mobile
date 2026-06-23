@@ -9,7 +9,8 @@ import {
   type BottomNavTab,
 } from "./BottomNavBar";
 
-type AppRoute = "/" | "/profile";
+type AppRoute = "/" | "/profile" | "/add-food";
+const HIDDEN_ROUTE_PREFIXES = ["/calendar", "/add-food"] as const;
 type TabLabelKey =
   | "tabs.menu"
   | "tabs.home"
@@ -70,16 +71,23 @@ const TAB_CONFIGS: readonly AppBottomNavTabConfig[] = [
 const CENTER_ACTION_CONFIG: AppBottomNavCenterActionConfig = {
   icon: "add",
   labelKey: "tabs.add",
-  targetRoute: "/",
+  targetRoute: "/add-food",
 };
 
 export function AppBottomNavBar() {
   const { t } = useTranslation("common");
   const router = useRouter();
   const pathname = usePathname();
+  const isHiddenRoute = HIDDEN_ROUTE_PREFIXES.some((prefix) =>
+    pathname.startsWith(prefix),
+  );
 
   const navigate = useCallback((route: AppRoute) => {
     router.replace(route);
+  }, [router]);
+
+  const openAddFood = useCallback(() => {
+    router.push("/add-food");
   }, [router]);
 
   const tabs = useMemo<readonly BottomNavTab[]>(
@@ -99,10 +107,14 @@ export function AppBottomNavBar() {
     () => ({
       icon: CENTER_ACTION_CONFIG.icon,
       accessibilityLabel: t(CENTER_ACTION_CONFIG.labelKey),
-      onPress: () => navigate(CENTER_ACTION_CONFIG.targetRoute),
+      onPress: openAddFood,
     }),
-    [navigate, t],
+    [openAddFood, t],
   );
+
+  if (isHiddenRoute) {
+    return null;
+  }
 
   return <BottomNavBar tabs={tabs} centerAction={centerAction} />;
 }

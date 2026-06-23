@@ -41,5 +41,50 @@
     "calendar": "Calendar",
     "profile": "Profile",
     "add": "Add"
+  },
+  "foodAdd": {
+    "title": "Add Food",
+    "close": "Close add food",
+    "barcode": "Scan barcode",
+    "resultsTitle": "Search results",
+    "searchPlaceholder": "Search foods",
+    "searchHint": "Start typing a product name to search the catalog.",
+    "loading": "Searching foods...",
+    "empty": "No products found. Try a different query.",
+    "selectedMeal": {
+      "breakfast": "Will be added to breakfast",
+      "lunch": "Will be added to lunch",
+      "dinner": "Will be added to dinner",
+      "snack": "Will be added to snack"
+    },
+    "meals": {
+      "now": "Now",
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snack": "Snack"
+    },
+    "calories": "{{value}} kcal",
+    "macroLine": "P {{protein}} • F {{fat}} • C {{carbs}}",
+    "servingUnits": {
+      "g": "g",
+      "ml": "ml",
+      "oz": "oz",
+      "cup": "cup",
+      "piece": "pc"
+    }
+  },
+  "foodPortion": {
+    "title": "Portion",
+    "servingSection": "Serving size",
+    "quantitySection": "Quantity",
+    "add": "Add to diary",
+    "presets": {
+      "1g": "{{amount}} {{unit}}",
+      "100g": "{{amount}} {{unit}}",
+      "portion": "Portion ({{amount}} {{unit}})",
+      "large": "Large portion ({{amount}} {{unit}})",
+      "default": "{{amount}} {{unit}}"
+    }
   }
 }

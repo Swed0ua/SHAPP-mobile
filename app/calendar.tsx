@@ -1,11 +1,11 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppCalendar } from "../src/components/AppCalendar";
+import { ScreenHeader } from "../src/components/ScreenHeader";
 import { useCalendarStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { parseDateId, toDateId } from "../src/utils/date";
@@ -35,30 +35,17 @@ export default function CalendarModalScreen() {
           backgroundColor: theme.colors.background.canvas,
           paddingTop: theme.spacing.md,
           paddingBottom: insets.bottom,
+          paddingHorizontal: theme.spacing.lg,
         },
       ]}
     >
-      <View style={styles.header}>
-        <Pressable
-          accessibilityRole="button"
-          hitSlop={8}
-          onPress={() => router.back()}
-          style={{ marginRight: theme.spacing.md * 2 }}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={theme.colors.content.primary}
-          />
-        </Pressable>
-        <Text style={[styles.title, { color: theme.colors.content.primary }]}>
-          {t("calendar.pickTitle")}
-        </Text>
-      </View>
-      <View style={{ flex: 1, marginTop: theme.spacing.md * 2 }}>
+      <ScreenHeader
+        title={t("calendar.pickTitle")}
+        onBack={() => router.back()}
+      />
 
-      <AppCalendar value={parseDateId(selectedId)} onChange={handleChange} />
-
+      <View style={[styles.content, { marginTop: theme.spacing.md }]}>
+        <AppCalendar value={parseDateId(selectedId)} onChange={handleChange} />
       </View>
     </View>
   );
@@ -67,16 +54,8 @@ export default function CalendarModalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
+  content: {
+    flex: 1,
   },
 });
