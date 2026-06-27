@@ -8,6 +8,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppBottomNavBar } from "../src/components/AppBottomNavBar";
+import { SuccessOverlayHost } from "../src/components/SuccessOverlay";
 import { useAppShellBootstrap } from "../src/hooks/useAppShellBootstrap";
 import { useTheme } from "../src/theme";
 
@@ -61,6 +62,7 @@ export default function RootLayout() {
           <Stack.Screen name="add-food" options={{ presentation: "modal" }} />
         </Stack>
         <AppBottomNavBar />
+        <SuccessOverlayHost />
         <StatusBar style={theme.mode === "dark" ? "light" : "dark"} />
       </View>
     </SafeAreaProvider>

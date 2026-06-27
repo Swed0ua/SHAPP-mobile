@@ -87,5 +87,8 @@
       "default": "{{amount}} {{unit}}"
     },
     "perServingFacts": "Per {{amount}} {{unit}}: {{calories}} kcal · P {{protein}} · F {{fat}} · C {{carbs}}"
+  },
+  "successOverlay": {
+    "label": "Added to diary"
   }
 }

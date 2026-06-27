@@ -14,6 +14,7 @@ import { getFoodItemById } from "../../src/services/foodSearchApi";
 import {
   useCalendarStore,
   useMealEntryStore,
+  useSuccessOverlayStore,
   type MealType,
   type ServingUnit,
 } from "../../src/store";
@@ -61,6 +62,7 @@ export default function FoodPortionScreen() {
 
   const dateId = useCalendarStore((state) => state.selectedId);
   const addEntry = useMealEntryStore((state) => state.addEntry);
+  const showSuccess = useSuccessOverlayStore((state) => state.show);
 
   const food = useMemo(
     () => (params.foodId ? getFoodItemById(params.foodId) : undefined),
@@ -189,7 +191,9 @@ export default function FoodPortionScreen() {
       servingUnit: selectedServing.unit,
       quantity,
     });
-    router.dismissAll();
+    showSuccess({
+      onDone: () => router.dismissAll(),
+    });
   };
 
   return (
