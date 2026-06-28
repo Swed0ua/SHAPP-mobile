@@ -79,6 +79,7 @@
     "servingSection": "Розмір порції",
     "quantitySection": "Кількість",
     "add": "Додати до щоденника",
+    "loading": "Завантаження продукту...",
     "presets": {
       "1g": "{{amount}} {{unit}}",
       "100g": "{{amount}} {{unit}}",
@@ -87,6 +88,16 @@
       "default": "{{amount}} {{unit}}"
     },
     "perServingFacts": "На {{amount}} {{unit}}: {{calories}} ккал · Б {{protein}} · Ж {{fat}} · В {{carbs}}"
+  },
+  "foodScan": {
+    "title": "Сканування штрихкоду",
+    "hint": "Наведіть камеру на штрихкод продукту",
+    "lookingUp": "Шукаємо продукт...",
+    "notFound": "Продукт за штрихкодом {{barcode}} не знайдено",
+    "retry": "Сканувати знову",
+    "permissionDenied": "Для сканування потрібен доступ до камери",
+    "grantPermission": "Надати доступ",
+    "unsupported": "Сканування штрихкодів недоступне на цій платформі"
   },
   "successOverlay": {
     "label": "Додано до щоденника"

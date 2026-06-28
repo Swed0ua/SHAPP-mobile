@@ -14,7 +14,8 @@ import {
   SEARCH_DEBOUNCE_MS,
 } from "../../src/constants/addFood";
 import { useDebouncedSearch } from "../../src/hooks/useDebouncedSearch";
-import { searchFoods } from "../../src/services/foodSearchApi";
+import { useOpenFoodPortion, useOpenFoodScan } from "../../src/hooks/useOpenFoodPortion";
+import { searchFoods } from "../../src/services/foodCatalog";
 import { type FoodItem, type ServingUnit } from "../../src/store";
 import { useTheme } from "../../src/theme";
 import { formatServingLabel } from "../../src/utils/mealEntry";
@@ -67,15 +68,8 @@ export default function AddFoodScreen() {
     [t],
   );
 
-  const openPortionScreen = useCallback(
-    (food: FoodItem) => {
-      router.push({
-        pathname: "/add-food/[foodId]",
-        params: { foodId: food.id, meal: effectiveMeal },
-      });
-    },
-    [effectiveMeal, router],
-  );
+  const openFoodPortion = useOpenFoodPortion(effectiveMeal);
+  const openFoodScan = useOpenFoodScan(effectiveMeal);
 
   const renderResult = useCallback(
     ({ item }: { item: FoodItem }) => (
@@ -94,10 +88,10 @@ export default function AddFoodScreen() {
           fat: item.nutrients.fat,
           carbs: item.nutrients.carbs,
         })}
-        onPress={() => openPortionScreen(item)}
+        onPress={() => openFoodPortion(item)}
       />
     ),
-    [openPortionScreen, servingUnitLabels, t],
+    [openFoodPortion, servingUnitLabels, t],
   );
 
   const emptyMessage = query.trim()
@@ -153,6 +147,7 @@ export default function AddFoodScreen() {
                 placeholder={t("foodAdd.searchPlaceholder")}
                 trailingIcon="barcode-outline"
                 trailingAccessibilityLabel={t("foodAdd.barcode")}
+                onTrailingPress={openFoodScan}
               />
             </View>
 

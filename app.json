@@ -13,7 +13,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "SHAPP uses the camera to scan product barcodes."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,11 +24,21 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["android.permission.CAMERA"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-localization", "expo-router"]
+    "plugins": [
+      "expo-localization",
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "SHAPP uses the camera to scan product barcodes."
+        }
+      ]
+    ]
   }
 }

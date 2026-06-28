@@ -79,6 +79,7 @@
     "servingSection": "Serving size",
     "quantitySection": "Quantity",
     "add": "Add to diary",
+    "loading": "Loading product...",
     "presets": {
       "1g": "{{amount}} {{unit}}",
       "100g": "{{amount}} {{unit}}",
@@ -87,6 +88,16 @@
       "default": "{{amount}} {{unit}}"
     },
     "perServingFacts": "Per {{amount}} {{unit}}: {{calories}} kcal · P {{protein}} · F {{fat}} · C {{carbs}}"
+  },
+  "foodScan": {
+    "title": "Scan barcode",
+    "hint": "Point the camera at the product barcode",
+    "lookingUp": "Looking up product...",
+    "notFound": "No product found for barcode {{barcode}}",
+    "retry": "Scan again",
+    "permissionDenied": "Camera access is required to scan barcodes",
+    "grantPermission": "Grant access",
+    "unsupported": "Barcode scanning is not available on this platform"
   },
   "successOverlay": {
     "label": "Added to diary"

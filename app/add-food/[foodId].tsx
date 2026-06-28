@@ -10,11 +10,13 @@ import { PortionLogFooter } from "../../src/components/PortionLogFooter";
 import { ScreenHeader } from "../../src/components/ScreenHeader";
 import { PopupSelect } from "../../src/components/PopupSelect";
 import { ServingInsight } from "../../src/components/ServingInsight";
-import { getFoodItemById } from "../../src/services/foodSearchApi";
+import { StatusPanel } from "../../src/components/StatusPanel";
+import { getFoodItemById } from "../../src/services/foodCatalog";
 import {
   useCalendarStore,
   useMealEntryStore,
   useSuccessOverlayStore,
+  type FoodItem,
   type MealType,
   type ServingUnit,
 } from "../../src/store";
@@ -64,10 +66,40 @@ export default function FoodPortionScreen() {
   const addEntry = useMealEntryStore((state) => state.addEntry);
   const showSuccess = useSuccessOverlayStore((state) => state.show);
 
-  const food = useMemo(
-    () => (params.foodId ? getFoodItemById(params.foodId) : undefined),
-    [params.foodId],
+  const [food, setFood] = useState<FoodItem | null>(null);
+  const [loadState, setLoadState] = useState<"loading" | "ready" | "error">(
+    "loading",
   );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!params.foodId) {
+      setLoadState("error");
+      return;
+    }
+
+    setLoadState("loading");
+    setFood(null);
+
+    void getFoodItemById(params.foodId).then((item) => {
+      if (cancelled) {
+        return;
+      }
+
+      if (item) {
+        setFood(item);
+        setLoadState("ready");
+        return;
+      }
+
+      setLoadState("error");
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [params.foodId]);
 
   const servings = useMemo(
     () => (food ? buildFoodServings(food) : []),
@@ -86,10 +118,10 @@ export default function FoodPortionScreen() {
   }, [selectedServingId, servings]);
 
   useEffect(() => {
-    if (!food) {
+    if (loadState === "error") {
       router.back();
     }
-  }, [food, router]);
+  }, [loadState, router]);
 
   const unitLabels = useMemo(
     () =>
@@ -177,6 +209,29 @@ export default function FoodPortionScreen() {
     const meal = params.meal ?? "";
     return isMealType(meal) ? meal : "snack";
   })();
+
+  if (loadState === "loading") {
+    return (
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: theme.colors.background.canvas,
+            paddingTop: theme.spacing.md,
+            paddingHorizontal: theme.spacing.lg,
+          },
+        ]}
+      >
+        <ScreenHeader
+          title={t("foodPortion.title")}
+          subtitle={t(`foodAdd.selectedMeal.${mealType}` as const)}
+          onBack={() => router.back()}
+          backAccessibilityLabel={t("foodAdd.close")}
+        />
+        <StatusPanel message={t("foodPortion.loading")} isLoading />
+      </View>
+    );
+  }
 
   if (!food || !selectedServing || !nutrients) {
     return null;

@@ -28,6 +28,8 @@ export type FoodItem = {
   readonly description?: string;
   /** Extra catalog metadata (category, source note, etc.). */
   readonly details?: string;
+  /** EAN-13 / UPC barcode when available from catalog. */
+  readonly barcode?: string;
 };
 
 export type MealEntry = {
