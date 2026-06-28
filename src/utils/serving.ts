@@ -35,3 +35,14 @@ export function computePortionNutrients(
   const ratio = servingAmount / food.servingAmount;
   return scaleNutrients(food.nutrients, ratio * quantity);
 }
+
+export function resolveServingId(
+  servings: readonly ServingOption[],
+  amount: number,
+  unit: ServingUnit,
+): string {
+  const match = servings.find(
+    (serving) => serving.amount === amount && serving.unit === unit,
+  );
+  return match?.id ?? servings[0]?.id ?? "";
+}

@@ -18,3 +18,10 @@ export const TAB_ACTIVE_DOT_SIZE = 4;
 export const TAB_ACTIVE_DOT_GLOW_BLUR = 30;
 export const TAB_ACTIVE_DOT_GLOW_SPREAD = 14;
 export const TAB_ACTIVE_DOT_GLOW_OPACITY_HEX = "50";
+
+export function getBottomNavOverlayHeight(
+  safeAreaBottom: number,
+  spacingSm: number,
+): number {
+  return FAB_OVERLAP + BAR_HEIGHT + 20 + Math.max(safeAreaBottom, spacingSm);
+}

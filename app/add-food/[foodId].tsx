@@ -2,7 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ItemPreview } from "../../src/components/ItemPreview";
@@ -22,7 +22,7 @@ import {
 } from "../../src/store";
 import type { ServingOption } from "../../src/store/types/serving";
 import { useTheme } from "../../src/theme";
-import { buildFoodServings, computePortionNutrients } from "../../src/utils/serving";
+import { buildFoodServings, computePortionNutrients, resolveServingId } from "../../src/utils/serving";
 
 function isMealType(value: string): value is MealType {
   return (
@@ -57,13 +57,20 @@ function servingLabel(
 
 export default function FoodPortionScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ foodId: string; meal?: string }>();
+  const params = useLocalSearchParams<{
+    foodId: string;
+    meal?: string;
+    entryId?: string;
+  }>();
   const { t } = useTranslation("common");
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
   const dateId = useCalendarStore((state) => state.selectedId);
   const addEntry = useMealEntryStore((state) => state.addEntry);
+  const updateEntry = useMealEntryStore((state) => state.updateEntry);
+  const deleteEntry = useMealEntryStore((state) => state.deleteEntry);
+  const byDateId = useMealEntryStore((state) => state.byDateId);
   const showSuccess = useSuccessOverlayStore((state) => state.show);
 
   const [food, setFood] = useState<FoodItem | null>(null);
@@ -106,22 +113,69 @@ export default function FoodPortionScreen() {
     [food],
   );
 
-  const [selectedServingId, setSelectedServingId] = useState(
-    servings[1]?.id ?? servings[0]?.id ?? "",
-  );
+  const [selectedServingId, setSelectedServingId] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [hasPrefilledEdit, setHasPrefilledEdit] = useState(false);
 
-  useEffect(() => {
-    if (servings.length > 0 && !servings.some((s) => s.id === selectedServingId)) {
-      setSelectedServingId(servings[1]?.id ?? servings[0].id);
+  const editEntry = useMemo(() => {
+    if (!params.entryId) {
+      return null;
     }
-  }, [selectedServingId, servings]);
+
+    for (const entries of Object.values(byDateId)) {
+      const match = entries?.find((entry) => entry.id === params.entryId);
+      if (match) {
+        return match;
+      }
+    }
+
+    return null;
+  }, [byDateId, params.entryId]);
+
+  const isEditMode = editEntry !== null;
 
   useEffect(() => {
-    if (loadState === "error") {
+    if (servings.length === 0) {
+      return;
+    }
+
+    if (isEditMode && editEntry && !hasPrefilledEdit) {
+      setQuantity(editEntry.quantity);
+      setSelectedServingId(
+        resolveServingId(
+          servings,
+          editEntry.servingAmount,
+          editEntry.servingUnit ?? "g",
+        ),
+      );
+      setHasPrefilledEdit(true);
+      return;
+    }
+
+    if (!isEditMode && !selectedServingId) {
+      setSelectedServingId(servings[1]?.id ?? servings[0]?.id ?? "");
+      return;
+    }
+
+    if (
+      selectedServingId &&
+      !servings.some((serving) => serving.id === selectedServingId)
+    ) {
+      setSelectedServingId(servings[1]?.id ?? servings[0]?.id ?? "");
+    }
+  }, [
+    editEntry,
+    hasPrefilledEdit,
+    isEditMode,
+    selectedServingId,
+    servings,
+  ]);
+
+  useEffect(() => {
+    if (loadState === "error" || (params.entryId && !editEntry && loadState === "ready")) {
       router.back();
     }
-  }, [loadState, router]);
+  }, [editEntry, loadState, params.entryId, router]);
 
   const unitLabels = useMemo(
     () =>
@@ -237,7 +291,18 @@ export default function FoodPortionScreen() {
     return null;
   }
 
-  const handleAdd = async () => {
+  const handleSave = async () => {
+    if (isEditMode && editEntry) {
+      await updateEntry({
+        id: editEntry.id,
+        quantity,
+        servingAmount: selectedServing.amount,
+        servingUnit: selectedServing.unit,
+      });
+      router.back();
+      return;
+    }
+
     await addEntry({
       date: dateId,
       mealType,
@@ -249,6 +314,30 @@ export default function FoodPortionScreen() {
     showSuccess({
       onDone: () => router.dismissAll(),
     });
+  };
+
+  const handleDelete = () => {
+    if (!editEntry) {
+      return;
+    }
+
+    Alert.alert(
+      t("foodPortion.deleteConfirm.title"),
+      t("foodPortion.deleteConfirm.message"),
+      [
+        { text: t("foodPortion.deleteConfirm.cancel"), style: "cancel" },
+        {
+          text: t("foodPortion.delete"),
+          style: "destructive",
+          onPress: () => {
+            void (async () => {
+              await deleteEntry(editEntry.id);
+              router.back();
+            })();
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -310,8 +399,17 @@ export default function FoodPortionScreen() {
           fat: nutrients.fat,
           carbs: nutrients.carbs,
         })}
-        actionLabel={t("foodPortion.add")}
-        onAction={() => void handleAdd()}
+        actionLabel={isEditMode ? t("foodPortion.save") : t("foodPortion.add")}
+        onAction={() => void handleSave()}
+        secondaryAction={
+          isEditMode
+            ? {
+                label: t("foodPortion.delete"),
+                onPress: handleDelete,
+                tone: "danger",
+              }
+            : undefined
+        }
         bottomInset={insets.bottom}
       />
     </View>

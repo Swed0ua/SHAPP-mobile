@@ -9,7 +9,7 @@ import { BarcodeScannerView } from "../../src/components/BarcodeScanner";
 import { PrimaryButton } from "../../src/components/PrimaryButton";
 import { ScreenHeader } from "../../src/components/ScreenHeader";
 import { StatusPanel } from "../../src/components/StatusPanel";
-import { useOpenFoodPortion } from "../../src/hooks/useOpenFoodPortion";
+import { useFoodPortionNavigation } from "../../src/hooks/useFoodPortionNavigation";
 import { lookupFoodByBarcode } from "../../src/services/foodCatalog";
 import { type MealType } from "../../src/store";
 import { useTheme } from "../../src/theme";
@@ -38,7 +38,7 @@ export default function FoodScanScreen() {
     return isMealType(meal) ? meal : "snack";
   })();
 
-  const openFoodPortion = useOpenFoodPortion(mealType);
+  const { openAdd } = useFoodPortionNavigation();
   const [phase, setPhase] = useState<ScanPhase>("idle");
   const [lastBarcode, setLastBarcode] = useState<string | null>(null);
 
@@ -61,7 +61,7 @@ export default function FoodScanScreen() {
         const food = await lookupFoodByBarcode(barcode);
 
         if (food) {
-          openFoodPortion(food);
+          openAdd(food, mealType);
           return;
         }
 
@@ -70,7 +70,7 @@ export default function FoodScanScreen() {
         setPhase("notFound");
       }
     },
-    [openFoodPortion, phase],
+    [mealType, openAdd, phase],
   );
 
   const handleRetry = useCallback(() => {

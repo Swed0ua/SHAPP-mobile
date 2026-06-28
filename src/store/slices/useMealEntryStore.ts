@@ -6,6 +6,7 @@ import {
   deleteMealEntry,
   fetchMealEntriesByDate,
   moveMealEntry,
+  updateMealEntry,
   updateMealEntryQuantity,
 } from "../../services/mealEntryApi";
 import { syncDayLog } from "../syncDayLog";
@@ -14,6 +15,7 @@ import type {
   CreateMealEntryInput,
   MealEntry,
   MoveMealEntryInput,
+  UpdateMealEntryInput,
   UpdateMealEntryQuantityInput,
 } from "../types/mealEntry";
 
@@ -25,6 +27,7 @@ type MealEntryState = {
   loadEntries: (dateId: string) => Promise<void>;
   addEntry: (input: AddMealEntryInput) => Promise<MealEntry>;
   updateQuantity: (input: UpdateMealEntryQuantityInput) => Promise<void>;
+  updateEntry: (input: UpdateMealEntryInput) => Promise<void>;
   moveEntry: (input: MoveMealEntryInput) => Promise<void>;
   deleteEntry: (id: string) => Promise<void>;
 };
@@ -73,6 +76,21 @@ export const useMealEntryStore = create<MealEntryState>((set, get) => ({
 
   updateQuantity: async (input) => {
     const entry = await updateMealEntryQuantity(input);
+    const state = get();
+    const entries = state.byDateId[entry.date] ?? [];
+    set({
+      byDateId: {
+        ...state.byDateId,
+        [entry.date]: entries.map((item) =>
+          item.id === entry.id ? entry : item,
+        ),
+      },
+    });
+    syncDayLog(entry.date);
+  },
+
+  updateEntry: async (input) => {
+    const entry = await updateMealEntry(input);
     const state = get();
     const entries = state.byDateId[entry.date] ?? [];
     set({

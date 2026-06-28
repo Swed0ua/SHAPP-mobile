@@ -9,6 +9,7 @@ import { SettingsNumberField } from "../src/components/SettingsNumberField";
 import { SettingsSection } from "../src/components/SettingsSection";
 import { SettingsTextField } from "../src/components/SettingsTextField";
 import { StatusPanel } from "../src/components/StatusPanel";
+import { useBottomNavContentInset } from "../src/hooks/useBottomNavContentInset";
 import {
   useLocaleStore,
   useUserProfileStore,
@@ -46,6 +47,7 @@ export default function ProfileScreen() {
   const { t } = useTranslation("common");
   const { theme, themePreference, setThemePreference } = useTheme();
   const insets = useSafeAreaInsets();
+  const bottomInset = useBottomNavContentInset();
 
   const profile = useUserProfileStore((state) => state.profile);
   const profileStatus = useUserProfileStore((state) => state.status);
@@ -146,7 +148,7 @@ export default function ProfileScreen() {
         styles.content,
         {
           paddingTop: theme.spacing.lg,
-          paddingBottom: insets.bottom + theme.spacing.xxl * 5,
+          paddingBottom: bottomInset,
           paddingHorizontal: theme.spacing.lg,
         },
       ]}
@@ -225,7 +227,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    rowGap: 22,
+    rowGap: 22
   },
   title: {
     fontSize: 28,

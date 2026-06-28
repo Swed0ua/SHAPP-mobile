@@ -2,16 +2,19 @@ import { useMemo } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { DateStrip } from "../src/components/DateStrip";
+import { DayMealLog } from "../src/components/DayMealLog";
 import { NutrientBlock } from "../src/components/NutrientBlock";
 import { ProgressRing } from "../src/components/ProgressRing";
 import { RING_SIZE } from "../src/components/ProgressRing/constants";
 import { SideStat } from "../src/components/SideStat";
 import { useSelectedDay } from "../src/hooks/useSelectedDay";
+import { useBottomNavContentInset } from "../src/hooks/useBottomNavContentInset";
 import { useTheme } from "../src/theme";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
   const { day, goals, nutrients } = useSelectedDay();
+  const bottomInset = useBottomNavContentInset();
 
   const styles = useMemo(
     () =>
@@ -40,14 +43,20 @@ export default function HomeScreen() {
         nutrients: {
           paddingHorizontal: 4,
           paddingTop: theme.spacing.xxl,
-          paddingBottom: theme.spacing.xxl * 3,
+        },
+        meals: {
+          paddingHorizontal: theme.spacing.lg,
+          paddingTop: 80,
         },
       }),
     [theme],
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: bottomInset }}
+    >
       <View style={styles.mainContent}>
         <View style={styles.dateStrip}>
           <DateStrip />
@@ -77,6 +86,10 @@ export default function HomeScreen() {
 
         <View style={styles.nutrients}>
           <NutrientBlock items={nutrients} />
+        </View>
+
+        <View style={styles.meals}>
+          <DayMealLog />
         </View>
       </View>
     </ScrollView>

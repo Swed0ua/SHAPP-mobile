@@ -21,6 +21,7 @@ export type {
   MoveMealEntryInput,
   Nutrients,
   ServingUnit,
+  UpdateMealEntryInput,
   UpdateMealEntryQuantityInput,
 } from "./types/mealEntry";
 export {

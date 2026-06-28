@@ -4,6 +4,13 @@ import { StyleSheet, View } from "react-native";
 import { NutrientPreview } from "../NutrientPreview";
 import { PrimaryButton } from "../PrimaryButton";
 import { QuantityControl } from "../QuantityControl";
+import { TextButton } from "../TextButton";
+
+export interface PortionLogFooterSecondaryAction {
+  readonly label: string;
+  readonly onPress: () => void;
+  readonly tone?: "default" | "danger";
+}
 
 export interface PortionLogFooterProps {
   readonly quantity: number;
@@ -13,6 +20,7 @@ export interface PortionLogFooterProps {
   readonly macroLine: string;
   readonly actionLabel: string;
   readonly onAction: () => void;
+  readonly secondaryAction?: PortionLogFooterSecondaryAction;
   readonly bottomInset?: number;
 }
 
@@ -25,6 +33,7 @@ export const PortionLogFooter = memo<PortionLogFooterProps>(
     macroLine,
     actionLabel,
     onAction,
+    secondaryAction,
     bottomInset = 0,
   }) => (
     <View style={[styles.container, { paddingBottom: Math.max(bottomInset, 12) }]}>
@@ -38,6 +47,13 @@ export const PortionLogFooter = memo<PortionLogFooterProps>(
       />
       <NutrientPreview caloriesLabel={caloriesLabel} macroLine={macroLine} />
       <PrimaryButton label={actionLabel} onPress={onAction} />
+      {secondaryAction ? (
+        <TextButton
+          label={secondaryAction.label}
+          onPress={secondaryAction.onPress}
+          tone={secondaryAction.tone}
+        />
+      ) : null}
     </View>
   ),
 );

@@ -14,7 +14,7 @@ import {
   SEARCH_DEBOUNCE_MS,
 } from "../../src/constants/addFood";
 import { useDebouncedSearch } from "../../src/hooks/useDebouncedSearch";
-import { useOpenFoodPortion, useOpenFoodScan } from "../../src/hooks/useOpenFoodPortion";
+import { useFoodPortionNavigation, useOpenFoodScan } from "../../src/hooks/useFoodPortionNavigation";
 import { searchFoods } from "../../src/services/foodCatalog";
 import { type FoodItem, type ServingUnit } from "../../src/store";
 import { useTheme } from "../../src/theme";
@@ -68,7 +68,7 @@ export default function AddFoodScreen() {
     [t],
   );
 
-  const openFoodPortion = useOpenFoodPortion(effectiveMeal);
+  const { openAdd } = useFoodPortionNavigation();
   const openFoodScan = useOpenFoodScan(effectiveMeal);
 
   const renderResult = useCallback(
@@ -88,10 +88,10 @@ export default function AddFoodScreen() {
           fat: item.nutrients.fat,
           carbs: item.nutrients.carbs,
         })}
-        onPress={() => openFoodPortion(item)}
+        onPress={() => openAdd(item, effectiveMeal)}
       />
     ),
-    [openFoodPortion, servingUnitLabels, t],
+    [effectiveMeal, openAdd, servingUnitLabels, t],
   );
 
   const emptyMessage = query.trim()

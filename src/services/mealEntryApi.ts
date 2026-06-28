@@ -1,14 +1,17 @@
+import { getFoodItemById } from "./foodCatalog";
 import { MOCK_USER_ID } from "../constants/user";
 import type {
   CreateMealEntryInput,
   MealEntry,
   MoveMealEntryInput,
+  UpdateMealEntryInput,
   UpdateMealEntryQuantityInput,
 } from "../store/types/mealEntry";
 import {
   createMealEntrySnapshot,
   scaleNutrients,
 } from "../utils/mealEntry";
+import { computePortionNutrients } from "../utils/serving";
 import { todayId } from "../utils/date";
 
 const API_DELAY_MS = 300;
@@ -143,6 +146,58 @@ export async function updateMealEntryQuantity(
         },
         input.quantity,
       ),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const next = [...entries];
+    next[index] = updated;
+    setEntries(date, next);
+    return updated;
+  }
+
+  throw new Error(`Meal entry not found: ${input.id}`);
+}
+
+export async function updateMealEntry(
+  input: UpdateMealEntryInput,
+): Promise<MealEntry> {
+  await delay();
+
+  for (const [date, entries] of entriesByDate.entries()) {
+    const index = entries.findIndex((entry) => entry.id === input.id);
+    if (index === -1) {
+      continue;
+    }
+
+    const current = entries[index];
+    const food = await getFoodItemById(current.foodId);
+    const nutrients = food
+      ? computePortionNutrients(food, input.servingAmount, input.quantity)
+      : scaleNutrients(
+          {
+            calories: current.nutrients.calories / current.quantity,
+            protein: current.nutrients.protein / current.quantity,
+            fat: current.nutrients.fat / current.quantity,
+            carbs: current.nutrients.carbs / current.quantity,
+            fiber: current.nutrients.fiber
+              ? current.nutrients.fiber / current.quantity
+              : undefined,
+            sugar: current.nutrients.sugar
+              ? current.nutrients.sugar / current.quantity
+              : undefined,
+            sodium: current.nutrients.sodium
+              ? current.nutrients.sodium / current.quantity
+              : undefined,
+          },
+          input.quantity,
+        );
+
+    const updated: MealEntry = {
+      ...current,
+      quantity: input.quantity,
+      servingAmount: input.servingAmount,
+      servingUnit: input.servingUnit,
+      nutrients,
       updatedAt: new Date().toISOString(),
     };
 

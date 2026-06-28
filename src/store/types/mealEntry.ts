@@ -66,6 +66,13 @@ export type UpdateMealEntryQuantityInput = {
   readonly quantity: number;
 };
 
+export type UpdateMealEntryInput = {
+  readonly id: string;
+  readonly quantity: number;
+  readonly servingAmount: number;
+  readonly servingUnit: ServingUnit;
+};
+
 export type MoveMealEntryInput = {
   readonly id: string;
   readonly mealType: MealType;

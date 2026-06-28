@@ -1,12 +1,17 @@
+import type { TFunction } from "i18next";
+
 import type { NutrientId } from "../components/NutrientBlock/types";
 import { NUTRIENT_IDS } from "../components/NutrientBlock/types";
+import type { InfoCardProps } from "../components/InfoCard";
 import type { DayLog } from "../store/types";
 import type {
   CreateMealEntryInput,
   MealEntry,
+  MealType,
   Nutrients,
   ServingUnit,
 } from "../store/types/mealEntry";
+import { MEAL_SLOTS } from "./meal";
 
 export function scaleNutrients(
   nutrients: Nutrients,
@@ -93,4 +98,54 @@ export function formatServingLabel(
   unitLabels: Record<ServingUnit, string>,
 ): string {
   return `${amount} ${unitLabels[unit]}`;
+}
+
+export function groupEntriesByMealType(
+  entries: readonly MealEntry[],
+): Record<MealType, MealEntry[]> {
+  const grouped = MEAL_SLOTS.reduce(
+    (acc, mealType) => {
+      acc[mealType] = [];
+      return acc;
+    },
+    {} as Record<MealType, MealEntry[]>,
+  );
+
+  for (const entry of entries) {
+    grouped[entry.mealType].push(entry);
+  }
+
+  return grouped;
+}
+
+export function sumEntryCalories(entries: readonly MealEntry[]): number {
+  return entries.reduce((total, entry) => total + entry.nutrients.calories, 0);
+}
+
+export function buildMealEntryCardModel(
+  entry: MealEntry,
+  unitLabels: Record<ServingUnit, string>,
+  t: TFunction<"common">,
+): Pick<
+  InfoCardProps,
+  "title" | "subtitle" | "highlight" | "highlightDetail" | "footer" | "imageUri"
+> {
+  const servingUnit = entry.servingUnit ?? "g";
+
+  return {
+    title: entry.title,
+    subtitle: entry.brand ?? undefined,
+    imageUri: entry.imageUrl ?? undefined,
+    highlight: t("foodAdd.calories", { value: entry.nutrients.calories }),
+    highlightDetail: formatServingLabel(
+      entry.servingAmount * entry.quantity,
+      servingUnit,
+      unitLabels,
+    ),
+    footer: t("foodAdd.macroLine", {
+      protein: entry.nutrients.protein,
+      fat: entry.nutrients.fat,
+      carbs: entry.nutrients.carbs,
+    }),
+  };
 }
