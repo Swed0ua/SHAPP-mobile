@@ -101,5 +101,35 @@
   },
   "successOverlay": {
     "label": "Added to diary"
+  },
+  "profile": {
+    "title": "Profile",
+    "loading": "Loading profile...",
+    "sections": {
+      "account": "Account",
+      "activity": "Activity level",
+      "body": "Body metrics",
+      "appearance": "Appearance",
+      "language": "Language"
+    },
+    "fields": {
+      "displayName": "Display name",
+      "displayNamePlaceholder": "Your name",
+      "avatar": "Profile photo",
+      "changeAvatar": "Change photo",
+      "weight": "Weight",
+      "height": "Height"
+    },
+    "units": {
+      "kg": "kg",
+      "cm": "cm"
+    },
+    "activity": {
+      "sedentary": "Sedentary",
+      "light": "Light",
+      "moderate": "Moderate",
+      "active": "Active",
+      "very_active": "Very active"
+    }
   }
 }

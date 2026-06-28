@@ -101,5 +101,35 @@
   },
   "successOverlay": {
     "label": "Додано до щоденника"
+  },
+  "profile": {
+    "title": "Профіль",
+    "loading": "Завантаження профілю...",
+    "sections": {
+      "account": "Обліковий запис",
+      "activity": "Рівень активності",
+      "body": "Параметри тіла",
+      "appearance": "Зовнішній вигляд",
+      "language": "Мова"
+    },
+    "fields": {
+      "displayName": "Ім'я",
+      "displayNamePlaceholder": "Ваше ім'я",
+      "avatar": "Фото профілю",
+      "changeAvatar": "Змінити фото",
+      "weight": "Вага",
+      "height": "Зріст"
+    },
+    "units": {
+      "kg": "кг",
+      "cm": "см"
+    },
+    "activity": {
+      "sedentary": "Мало руху",
+      "light": "Легка",
+      "moderate": "Помірна",
+      "active": "Активна",
+      "very_active": "Дуже активна"
+    }
   }
 }

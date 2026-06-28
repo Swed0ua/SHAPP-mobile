@@ -15,7 +15,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "SHAPP uses the camera to scan product barcodes."
+        "NSCameraUsageDescription": "SHAPP uses the camera to scan product barcodes.",
+        "NSPhotoLibraryUsageDescription": "SHAPP uses your photo library to set a profile picture."
       }
     },
     "android": {
@@ -25,7 +26,10 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "permissions": ["android.permission.CAMERA"]
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_MEDIA_IMAGES"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -37,6 +41,12 @@
         "expo-camera",
         {
           "cameraPermission": "SHAPP uses the camera to scan product barcodes."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "SHAPP uses your photo library to set a profile picture."
         }
       ]
     ]

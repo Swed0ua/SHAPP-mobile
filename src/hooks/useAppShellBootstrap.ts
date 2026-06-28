@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 
-import { useLocaleStore, useThemeStore } from "../store";
+import { useLocaleStore, useThemeStore, useUserProfileStore } from "../store";
 
 export function useAppShellBootstrap() {
   const systemColorScheme = useColorScheme();
@@ -15,18 +15,29 @@ export function useAppShellBootstrap() {
   const resolveInitialTheme = useThemeStore((s) => s.resolveInitialTheme);
   const applySystemAppearance = useThemeStore((s) => s.applySystemAppearance);
 
+  const isInitialProfileResolved = useUserProfileStore(
+    (s) => s.isInitialProfileResolved,
+  );
+  const resolveInitialProfile = useUserProfileStore(
+    (s) => s.resolveInitialProfile,
+  );
+
   useEffect(() => {
     void Promise.all([
       resolveInitialLocale(),
       resolveInitialTheme(),
+      resolveInitialProfile(),
     ]);
-  }, [resolveInitialLocale, resolveInitialTheme]);
+  }, [resolveInitialLocale, resolveInitialProfile, resolveInitialTheme]);
 
   useEffect(() => {
     applySystemAppearance(systemColorScheme);
   }, [applySystemAppearance, systemColorScheme]);
 
   return {
-    isAppShellReady: isInitialLocaleResolved && isInitialThemeResolved,
+    isAppShellReady:
+      isInitialLocaleResolved &&
+      isInitialThemeResolved &&
+      isInitialProfileResolved,
   };
 }
