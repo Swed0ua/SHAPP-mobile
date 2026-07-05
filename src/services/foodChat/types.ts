@@ -13,6 +13,25 @@ export type AiChatReply = {
   readonly items: readonly AiFoodSuggestion[];
 };
 
+export type FoodChatMessage =
+  | {
+      readonly id: string;
+      readonly role: "user";
+      readonly text: string;
+      readonly createdAt: string;
+    }
+  | {
+      readonly id: string;
+      readonly role: "assistant";
+      readonly text: string;
+      readonly items: readonly AiFoodSuggestion[];
+      readonly createdAt: string;
+    };
+
+export type FoodChatListItem =
+  | { readonly type: "date"; readonly id: string; readonly label: string }
+  | { readonly type: "message"; readonly id: string; readonly message: FoodChatMessage };
+
 export interface FoodChatClient {
   submitMessage(message: string): Promise<AiChatReply>;
 }

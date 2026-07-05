@@ -22,10 +22,12 @@ import { InfoCard } from "../../src/components/InfoCard";
 import { PrimaryButton } from "../../src/components/PrimaryButton";
 import { ScreenHeader } from "../../src/components/ScreenHeader";
 import { DEFAULT_MEAL_SELECTION } from "../../src/constants/addFood";
+import { useFoodChatHistory } from "../../src/hooks/useFoodChatHistory";
 import { useFoodPortionNavigation, useOpenFoodScan } from "../../src/hooks/useFoodPortionNavigation";
 import {
   submitFoodChatMessage,
   type AiFoodSuggestion,
+  type FoodChatListItem,
 } from "../../src/services/foodChat";
 import {
   useCalendarStore,
@@ -34,6 +36,10 @@ import {
   type ServingUnit,
 } from "../../src/store";
 import { useTheme } from "../../src/theme";
+import {
+  buildFoodChatListItems,
+  formatChatMessageTime,
+} from "../../src/utils/foodChatFormat";
 import { formatServingLabel } from "../../src/utils/mealEntry";
 import {
   isMealSelection,
@@ -43,16 +49,7 @@ import {
 } from "../../src/utils/meal";
 import { computePortionNutrients } from "../../src/utils/serving";
 
-type ChatMessage =
-  | { readonly id: string; readonly role: "user"; readonly text: string }
-  | {
-      readonly id: string;
-      readonly role: "assistant";
-      readonly text: string;
-      readonly items: readonly AiFoodSuggestion[];
-    };
-
-function createId(): string {
+function createMessageId(): string {
   return `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
@@ -63,7 +60,7 @@ export default function AddFoodScreen() {
   const { t } = useTranslation("common");
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  const listRef = useRef<FlatList<ChatMessage>>(null);
+  const listRef = useRef<FlatList<FoodChatListItem>>(null);
   const isNearBottomRef = useRef(true);
   const pendingAutoScrollRef = useRef(false);
   const isAutoScrollingRef = useRef(false);
@@ -71,13 +68,16 @@ export default function AddFoodScreen() {
   const dateId = useCalendarStore((state) => state.selectedId);
   const addEntry = useMealEntryStore((state) => state.addEntry);
 
+  const { messages, setMessages, isHydrated } = useFoodChatHistory();
+  const listItems = useMemo(() => buildFoodChatListItems(messages), [messages]);
+
   const [mealSelection, setMealSelection] =
     useState<MealSelection>(DEFAULT_MEAL_SELECTION);
   const [draft, setDraft] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [hasUnreadAssistant, setHasUnreadAssistant] = useState(false);
   const prevMessageCountRef = useRef(0);
+  const skipUnreadCheckRef = useRef(true);
 
   const markAssistantAsRead = useCallback(() => {
     setHasUnreadAssistant(false);
@@ -94,7 +94,7 @@ export default function AddFoodScreen() {
       return;
     }
 
-    const lastIndex = messages.length - 1;
+    const lastIndex = listItems.length - 1;
 
     const run = (withAnimation: boolean) => {
       if (lastIndex >= 0) {
@@ -118,7 +118,7 @@ export default function AddFoodScreen() {
         }, animated ? 320 : 0);
       });
     });
-  }, [markAssistantAsRead, messages.length]);
+  }, [listItems.length, markAssistantAsRead]);
 
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -156,6 +156,16 @@ export default function AddFoodScreen() {
   }, [messages, isSending, scrollToBottom]);
 
   useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
+
+    if (skipUnreadCheckRef.current) {
+      skipUnreadCheckRef.current = false;
+      prevMessageCountRef.current = messages.length;
+      return;
+    }
+
     const lastMessage = messages[messages.length - 1];
     const hasNewMessage = messages.length > prevMessageCountRef.current;
 
@@ -168,7 +178,7 @@ export default function AddFoodScreen() {
     }
 
     prevMessageCountRef.current = messages.length;
-  }, [messages]);
+  }, [isHydrated, messages]);
 
   const effectiveMeal: MealType =
     mealSelection === "now" ? resolveCurrentMealSlot() : mealSelection;
@@ -222,7 +232,12 @@ export default function AddFoodScreen() {
     markAssistantAsRead();
     setMessages((current) => [
       ...current,
-      { id: createId(), role: "user", text },
+      {
+        id: createMessageId(),
+        role: "user",
+        text,
+        createdAt: new Date().toISOString(),
+      },
     ]);
     setIsSending(true);
 
@@ -231,10 +246,11 @@ export default function AddFoodScreen() {
       setMessages((current) => [
         ...current,
         {
-          id: createId(),
+          id: createMessageId(),
           role: "assistant",
           text: reply.text,
           items: reply.items,
+          createdAt: new Date().toISOString(),
         },
       ]);
     } finally {
@@ -303,9 +319,32 @@ export default function AddFoodScreen() {
     ],
   );
 
-  const renderMessage = useCallback(
-    ({ item }: { item: ChatMessage }) => {
-      if (item.role === "user") {
+  const renderListItem = useCallback(
+    ({ item }: { item: FoodChatListItem }) => {
+      if (item.type === "date") {
+        return (
+          <View
+            style={[
+              styles.dateSeparator,
+              {
+                backgroundColor: theme.colors.background.elevated,
+                borderColor: theme.colors.stroke.subtle,
+              },
+            ]}
+          >
+            <Text
+              style={[styles.dateSeparatorText, { color: theme.colors.content.secondary }]}
+            >
+              {item.label}
+            </Text>
+          </View>
+        );
+      }
+
+      const message = item.message;
+      const timeLabel = formatChatMessageTime(message.createdAt);
+
+      if (message.role === "user") {
         return (
           <View
             style={[
@@ -314,7 +353,15 @@ export default function AddFoodScreen() {
             ]}
           >
             <Text style={[styles.userText, { color: theme.colors.accent.onAccent }]}>
-              {item.text}
+              {message.text}
+            </Text>
+            <Text
+              style={[
+                styles.messageTime,
+                { color: theme.colors.accent.onAccent, opacity: 0.72 },
+              ]}
+            >
+              {timeLabel}
             </Text>
           </View>
         );
@@ -332,16 +379,21 @@ export default function AddFoodScreen() {
             ]}
           >
             <Text style={[styles.assistantText, { color: theme.colors.content.primary }]}>
-              {item.text}
+              {message.text}
+            </Text>
+            <Text
+              style={[styles.messageTime, { color: theme.colors.content.tertiary }]}
+            >
+              {timeLabel}
             </Text>
           </View>
-          {item.items.map(renderSuggestion)}
-          {item.items.length > 0 ? (
+          {message.items.map(renderSuggestion)}
+          {message.items.length > 0 ? (
             <PrimaryButton
-              label={t("foodChat.addAll", { count: item.items.length })}
+              label={t("foodChat.addAll", { count: message.items.length })}
               onPress={() => {
                 void (async () => {
-                  for (const suggestion of item.items) {
+                  for (const suggestion of message.items) {
                     await addSuggestion(suggestion);
                   }
                 })();
@@ -359,6 +411,8 @@ export default function AddFoodScreen() {
       theme.colors.accent.onAccent,
       theme.colors.background.elevated,
       theme.colors.content.primary,
+      theme.colors.content.secondary,
+      theme.colors.content.tertiary,
       theme.colors.stroke.subtle,
     ],
   );
@@ -399,9 +453,9 @@ export default function AddFoodScreen() {
       <View style={styles.listWrap}>
         <FlatList
           ref={listRef}
-          data={messages}
+          data={listItems}
           keyExtractor={(item) => item.id}
-          renderItem={renderMessage}
+          renderItem={renderListItem}
           contentContainerStyle={[
             styles.listContent,
             { paddingHorizontal: theme.spacing.lg },
@@ -421,9 +475,11 @@ export default function AddFoodScreen() {
           }}
           ListFooterComponent={isSending ? <FoodChatProcessing /> : null}
           ListEmptyComponent={
-            <Text style={[styles.hint, { color: theme.colors.content.secondary }]}>
-              {t("foodChat.hint")}
-            </Text>
+            isHydrated ? (
+              <Text style={[styles.hint, { color: theme.colors.content.secondary }]}>
+                {t("foodChat.hint")}
+              </Text>
+            ) : null
           }
         />
 
@@ -565,6 +621,26 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     lineHeight: 20,
     marginTop: 8,
+  },
+  dateSeparator: {
+    alignSelf: "center",
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginVertical: 2,
+  },
+  dateSeparatorText: {
+    fontSize: 12,
+    fontWeight: "600",
+    lineHeight: 16,
+  },
+  messageTime: {
+    alignSelf: "flex-end",
+    fontSize: 11,
+    fontWeight: "500",
+    lineHeight: 14,
+    marginTop: 4,
   },
   userBubble: {
     alignSelf: "flex-end",

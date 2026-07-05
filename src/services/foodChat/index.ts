@@ -11,4 +11,10 @@ export function submitFoodChatMessage(message: string): Promise<AiChatReply> {
   return chatClient.submitMessage(message);
 }
 
-export type { AiChatReply, AiFoodSuggestion, FoodChatClient };
+export type {
+  AiChatReply,
+  AiFoodSuggestion,
+  FoodChatClient,
+  FoodChatListItem,
+  FoodChatMessage,
+} from "./types";
