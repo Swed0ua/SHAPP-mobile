@@ -40,6 +40,11 @@ import {
   buildFoodChatListItems,
   formatChatMessageTime,
 } from "../../src/utils/foodChatFormat";
+import {
+  markSuggestionEntries,
+  markSuggestionEntry,
+  normalizeChatPortion,
+} from "../../src/utils/foodChatPortion";
 import { formatServingLabel } from "../../src/utils/mealEntry";
 import {
   isMealSelection,
@@ -67,9 +72,15 @@ export default function AddFoodScreen() {
 
   const dateId = useCalendarStore((state) => state.selectedId);
   const addEntry = useMealEntryStore((state) => state.addEntry);
+  const loadEntries = useMealEntryStore((state) => state.loadEntries);
+  const byDateId = useMealEntryStore((state) => state.byDateId);
 
   const { messages, setMessages, isHydrated } = useFoodChatHistory();
   const listItems = useMemo(() => buildFoodChatListItems(messages), [messages]);
+
+  useEffect(() => {
+    void loadEntries(dateId);
+  }, [dateId, loadEntries]);
 
   const [mealSelection, setMealSelection] =
     useState<MealSelection>(DEFAULT_MEAL_SELECTION);
@@ -203,21 +214,88 @@ export default function AddFoodScreen() {
     [t],
   );
 
-  const { openAdd } = useFoodPortionNavigation();
+  const { openEdit } = useFoodPortionNavigation();
   const openFoodScan = useOpenFoodScan(effectiveMeal);
 
-  const addSuggestion = useCallback(
+  const findEntry = useCallback(
+    (entryId: string) => {
+      for (const entries of Object.values(byDateId)) {
+        const match = entries?.find((entry) => entry.id === entryId);
+        if (match) {
+          return match;
+        }
+      }
+      return null;
+    },
+    [byDateId],
+  );
+
+  const addSuggestionToDiary = useCallback(
     async (suggestion: AiFoodSuggestion) => {
-      await addEntry({
+      const portion = normalizeChatPortion(suggestion);
+      return addEntry({
         date: dateId,
         mealType: effectiveMeal,
         food: suggestion.food,
-        servingAmount: suggestion.servingAmount,
-        servingUnit: suggestion.servingUnit,
-        quantity: suggestion.quantity,
+        servingAmount: portion.servingAmount,
+        servingUnit: portion.servingUnit,
+        quantity: portion.quantity,
       });
     },
     [addEntry, dateId, effectiveMeal],
+  );
+
+  const handleQuickAdd = useCallback(
+    async (messageId: string, suggestion: AiFoodSuggestion) => {
+      if (suggestion.entryId) {
+        return;
+      }
+
+      const entry = await addSuggestionToDiary(suggestion);
+      setMessages((current) =>
+        markSuggestionEntry(current, messageId, suggestion.food.id, entry.id),
+      );
+    },
+    [addSuggestionToDiary, setMessages],
+  );
+
+  const handleSuggestionOpen = useCallback(
+    async (messageId: string, suggestion: AiFoodSuggestion) => {
+      if (suggestion.entryId) {
+        const existing = findEntry(suggestion.entryId);
+        if (existing) {
+          openEdit(existing);
+          return;
+        }
+      }
+
+      const entry = await addSuggestionToDiary(suggestion);
+      setMessages((current) =>
+        markSuggestionEntry(current, messageId, suggestion.food.id, entry.id),
+      );
+      openEdit(entry);
+    },
+    [addSuggestionToDiary, findEntry, openEdit, setMessages],
+  );
+
+  const handleAddAll = useCallback(
+    async (messageId: string, items: readonly AiFoodSuggestion[]) => {
+      const pending = items.filter((item) => !item.entryId);
+      if (pending.length === 0) {
+        return;
+      }
+
+      const entriesByFoodId = new Map<string, string>();
+      for (const suggestion of pending) {
+        const entry = await addSuggestionToDiary(suggestion);
+        entriesByFoodId.set(suggestion.food.id, entry.id);
+      }
+
+      setMessages((current) =>
+        markSuggestionEntries(current, messageId, entriesByFoodId),
+      );
+    },
+    [addSuggestionToDiary, setMessages],
   );
 
   const handleSend = useCallback(async () => {
@@ -259,7 +337,8 @@ export default function AddFoodScreen() {
   }, [draft, isSending, markAssistantAsRead]);
 
   const renderSuggestion = useCallback(
-    (suggestion: AiFoodSuggestion) => {
+    (messageId: string, suggestion: AiFoodSuggestion) => {
+      const isAdded = Boolean(suggestion.entryId);
       const nutrients = computePortionNutrients(
         suggestion.food,
         suggestion.servingAmount,
@@ -284,38 +363,46 @@ export default function AddFoodScreen() {
                 fat: nutrients.fat,
                 carbs: nutrients.carbs,
               })}
-              onPress={() => openAdd(suggestion.food, effectiveMeal)}
+              onPress={() => void handleSuggestionOpen(messageId, suggestion)}
             />
           </View>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={t("foodChat.addItem")}
-            onPress={() => void addSuggestion(suggestion)}
+            accessibilityLabel={
+              isAdded ? t("foodChat.itemAdded") : t("foodChat.addItem")
+            }
+            accessibilityState={{ disabled: isAdded }}
+            disabled={isAdded}
+            onPress={() => void handleQuickAdd(messageId, suggestion)}
             style={({ pressed }) => [
               styles.addButton,
               {
-                backgroundColor: theme.colors.accent.muted,
-                opacity: pressed ? 0.85 : 1,
+                backgroundColor: isAdded
+                  ? `${theme.colors.status.success}22`
+                  : theme.colors.accent.muted,
+                opacity: isAdded ? 1 : pressed ? 0.85 : 1,
               },
             ]}
           >
             <Ionicons
-              name="add"
+              name={isAdded ? "checkmark" : "add"}
               size={24}
-              color={theme.colors.accent.default}
+              color={
+                isAdded ? theme.colors.status.success : theme.colors.accent.default
+              }
             />
           </Pressable>
         </View>
       );
     },
     [
-      addSuggestion,
-      effectiveMeal,
-      openAdd,
+      handleQuickAdd,
+      handleSuggestionOpen,
       servingUnitLabels,
       t,
       theme.colors.accent.default,
       theme.colors.accent.muted,
+      theme.colors.status.success,
     ],
   );
 
@@ -387,24 +474,25 @@ export default function AddFoodScreen() {
               {timeLabel}
             </Text>
           </View>
-          {message.items.map(renderSuggestion)}
+          {message.items.map((suggestion) =>
+            renderSuggestion(message.id, suggestion),
+          )}
           {message.items.length > 0 ? (
             <PrimaryButton
-              label={t("foodChat.addAll", { count: message.items.length })}
-              onPress={() => {
-                void (async () => {
-                  for (const suggestion of message.items) {
-                    await addSuggestion(suggestion);
-                  }
-                })();
-              }}
+              label={
+                message.items.every((item) => item.entryId)
+                  ? t("foodChat.addedAll", { count: message.items.length })
+                  : t("foodChat.addAll", { count: message.items.length })
+              }
+              disabled={message.items.every((item) => item.entryId)}
+              onPress={() => void handleAddAll(message.id, message.items)}
             />
           ) : null}
         </View>
       );
     },
     [
-      addSuggestion,
+      handleAddAll,
       renderSuggestion,
       t,
       theme.colors.accent.default,

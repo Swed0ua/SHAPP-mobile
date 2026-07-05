@@ -6,6 +6,8 @@ export type AiFoodSuggestion = {
   readonly quantity: number;
   readonly servingAmount: number;
   readonly servingUnit: ServingUnit;
+  /** Meal entry id after the suggestion was logged from chat. */
+  readonly entryId?: string;
 };
 
 export type AiChatReply = {

@@ -85,7 +85,9 @@
     "hint": "Type a meal or food — AI will suggest portions to log.",
     "send": "Send",
     "addItem": "Add to diary",
+    "itemAdded": "Added to diary",
     "addAll": "Add all ({{count}})",
+    "addedAll": "Added ({{count}})",
     "scrollToBottom": "Scroll to bottom"
   },
   "foodChat.processing": {

@@ -55,10 +55,10 @@ function buildMockSuggestions(): AiFoodSuggestion[] {
           sodium: 1,
         },
         description: "Гарнір із повільними вуглеводами.",
-        details: "AI-GPT · Порція 200 г",
+        details: "AI-GPT · Порція 256 г",
       },
       quantity: 1,
-      servingAmount: 200,
+      servingAmount: 256,
       servingUnit: "g",
     },
   ];
