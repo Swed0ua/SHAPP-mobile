@@ -56,11 +56,6 @@
     "title": "Add Food",
     "close": "Close add food",
     "barcode": "Scan barcode",
-    "resultsTitle": "Search results",
-    "searchPlaceholder": "Search foods",
-    "searchHint": "Start typing a product name to search the catalog.",
-    "loading": "Searching foods...",
-    "empty": "No products found. Try a different query.",
     "selectedMeal": {
       "breakfast": "Will be added to breakfast",
       "lunch": "Will be added to lunch",
@@ -83,6 +78,21 @@
       "cup": "cup",
       "piece": "pc"
     }
+  },
+  "foodChat": {
+    "title": "Add Food",
+    "placeholder": "Describe what you ate…",
+    "hint": "Type a meal or food — AI will suggest portions to log.",
+    "send": "Send",
+    "addItem": "Add to diary",
+    "addAll": "Add all ({{count}})",
+    "scrollToBottom": "Scroll to bottom"
+  },
+  "foodChat.processing": {
+    "parse": "Parsing your meal…",
+    "macros": "Calculating nutrients…",
+    "portions": "Sizing portions…",
+    "finalize": "Preparing suggestions…"
   },
   "foodPortion": {
     "title": "Portion",

@@ -10,6 +10,7 @@ const surface = {
   background: "#0B0F14",
   surface: "#151A21",
   surfaceLight: "#1F2630",
+  overlay: "rgba(21, 26, 33, 0.88)",
 } as const;
 
 const content = {
@@ -43,6 +44,7 @@ export const darkThemeColors: ThemeColors = {
     canvas: surface.background,
     elevated: surface.surface,
     muted: surface.surfaceLight,
+    overlay: surface.overlay,
   },
   content: {
     primary: content.textPrimary,

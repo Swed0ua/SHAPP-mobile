@@ -6,6 +6,8 @@ export interface ThemeBackgroundColors {
   readonly canvas: string;
   readonly elevated: string;
   readonly muted: string;
+  /** Semi-transparent surface for floating controls over scrollable content. */
+  readonly overlay: string;
 }
 
 export interface ThemeContentColors {

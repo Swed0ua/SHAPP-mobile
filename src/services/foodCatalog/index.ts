@@ -1,6 +1,9 @@
 import type { FoodItem } from "../../store/types/mealEntry";
 
-import { mockFoodCatalogClient } from "./mockFoodCatalogClient";
+import {
+  mockFoodCatalogClient,
+  registerCatalogFoods,
+} from "./mockFoodCatalogClient";
 import type { FoodCatalogClient } from "./types";
 
 let catalogClient: FoodCatalogClient = mockFoodCatalogClient;
@@ -21,6 +24,8 @@ export function getFoodItemById(foodId: string): Promise<FoodItem | null> {
 export function lookupFoodByBarcode(barcode: string): Promise<FoodItem | null> {
   return catalogClient.lookupByBarcode(barcode);
 }
+
+export { registerCatalogFoods };
 
 export type { FoodCatalogClient } from "./types";
 export { normalizeBarcode } from "./types";

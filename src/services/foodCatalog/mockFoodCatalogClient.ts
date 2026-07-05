@@ -1,8 +1,16 @@
+import type { FoodItem } from "../../store/types/mealEntry";
 import type { FoodCatalogClient } from "./types";
 import { MOCK_FOOD_CATALOG } from "./mockCatalog";
 import { normalizeBarcode } from "./types";
 
 const REQUEST_DELAY_MS = 450;
+const registeredFoods = new Map<string, FoodItem>();
+
+export function registerCatalogFoods(items: readonly FoodItem[]): void {
+  for (const item of items) {
+    registeredFoods.set(item.id, item);
+  }
+}
 
 function delay(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, REQUEST_DELAY_MS));
@@ -26,7 +34,11 @@ export function createMockFoodCatalogClient(): FoodCatalogClient {
 
     async getById(id) {
       await delay();
-      return MOCK_FOOD_CATALOG.find((item) => item.id === id) ?? null;
+      return (
+        registeredFoods.get(id) ??
+        MOCK_FOOD_CATALOG.find((item) => item.id === id) ??
+        null
+      );
     },
 
     async lookupByBarcode(barcode) {

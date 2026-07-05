@@ -2,7 +2,7 @@ export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 
 export type ServingUnit = "g" | "ml" | "oz" | "cup" | "piece";
 
-export type FoodSource = "fdc" | "user" | "shapp";
+export type FoodSource = "fdc" | "user" | "shapp" | "ai-gpt";
 
 export type Nutrients = {
   readonly calories: number;

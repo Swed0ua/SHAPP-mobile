@@ -4,6 +4,7 @@ const background = {
   canvas: "#FFFFFF",
   elevated: "#F4F4F5",
   muted: "#E4E4E7",
+  overlay: "rgba(255, 255, 255, 0.88)",
 } as const;
 
 const content = {
@@ -37,6 +38,7 @@ export const lightThemeColors: ThemeColors = {
     canvas: background.canvas,
     elevated: background.elevated,
     muted: background.muted,
+    overlay: background.overlay,
   },
   content: {
     primary: content.primary,
