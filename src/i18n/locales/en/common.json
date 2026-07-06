@@ -124,8 +124,10 @@
     "lookingUp": "Looking up product...",
     "notFound": "No product found for barcode {{barcode}}",
     "retry": "Scan again",
-    "permissionDenied": "Camera access is required to scan barcodes",
-    "grantPermission": "Grant access",
+    "permissionNeeded": "Allow camera access to scan barcodes",
+    "permissionDenied": "Camera access is disabled. Enable it in system settings.",
+    "grantPermission": "Allow camera access",
+    "openSettings": "Open settings",
     "unsupported": "Barcode scanning is not available on this platform"
   },
   "successOverlay": {

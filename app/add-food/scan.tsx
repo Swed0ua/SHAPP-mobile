@@ -1,14 +1,15 @@
 import { useCameraPermissions } from "expo-camera";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, StyleSheet, View } from "react-native";
+import { Linking, Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { BarcodeScannerView } from "../../src/components/BarcodeScanner";
 import { PrimaryButton } from "../../src/components/PrimaryButton";
 import { ScreenHeader } from "../../src/components/ScreenHeader";
 import { StatusPanel } from "../../src/components/StatusPanel";
+import { TextButton } from "../../src/components/TextButton";
 import { useFoodPortionNavigation } from "../../src/hooks/useFoodPortionNavigation";
 import { lookupFoodByBarcode } from "../../src/services/foodCatalog";
 import { type MealType } from "../../src/store";
@@ -32,6 +33,7 @@ export default function FoodScanScreen() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const [permission, requestPermission] = useCameraPermissions();
+  const didAutoRequestRef = useRef(false);
 
   const mealType: MealType = (() => {
     const meal = params.meal ?? "";
@@ -42,11 +44,22 @@ export default function FoodScanScreen() {
   const [phase, setPhase] = useState<ScanPhase>("idle");
   const [lastBarcode, setLastBarcode] = useState<string | null>(null);
 
+  const askForCameraPermission = useCallback(async () => {
+    await requestPermission();
+  }, [requestPermission]);
+
   useEffect(() => {
-    if (Platform.OS !== "web" && permission && !permission.granted && permission.canAskAgain) {
-      void requestPermission();
+    if (Platform.OS === "web" || !permission || permission.granted || didAutoRequestRef.current) {
+      return;
     }
-  }, [permission, requestPermission]);
+
+    didAutoRequestRef.current = true;
+    void askForCameraPermission();
+  }, [askForCameraPermission, permission]);
+
+  const openAppSettings = useCallback(() => {
+    void Linking.openSettings();
+  }, []);
 
   const handleBarcodeScanned = useCallback(
     async (barcode: string) => {
@@ -92,11 +105,21 @@ export default function FoodScanScreen() {
     if (!permission.granted) {
       return (
         <View style={styles.permissionBlock}>
-          <StatusPanel message={t("foodScan.permissionDenied")} />
-          {permission.canAskAgain ? (
-            <PrimaryButton
-              label={t("foodScan.grantPermission")}
-              onPress={() => void requestPermission()}
+          <StatusPanel
+            message={
+              permission.canAskAgain
+                ? t("foodScan.permissionNeeded")
+                : t("foodScan.permissionDenied")
+            }
+          />
+          <PrimaryButton
+            label={t("foodScan.grantPermission")}
+            onPress={() => void askForCameraPermission()}
+          />
+          {!permission.canAskAgain ? (
+            <TextButton
+              label={t("foodScan.openSettings")}
+              onPress={openAppSettings}
             />
           ) : null}
         </View>
