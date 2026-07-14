@@ -8,7 +8,8 @@ import {
   moveMealEntry,
   updateMealEntry,
   updateMealEntryQuantity,
-} from "../../services/mealEntryApi";
+} from "../../services/mealEntry";
+import { isSupabaseConfigured } from "../../services/supabase/client";
 import { syncDayLog } from "../syncDayLog";
 import type { LoadStatus } from "../types";
 import type {
@@ -18,6 +19,7 @@ import type {
   UpdateMealEntryInput,
   UpdateMealEntryQuantityInput,
 } from "../types/mealEntry";
+import { getAuthUserId } from "./useAuthStore";
 
 type AddMealEntryInput = Omit<CreateMealEntryInput, "userId">;
 
@@ -30,6 +32,7 @@ type MealEntryState = {
   updateEntry: (input: UpdateMealEntryInput) => Promise<void>;
   moveEntry: (input: MoveMealEntryInput) => Promise<void>;
   deleteEntry: (id: string) => Promise<void>;
+  clearCache: () => void;
 };
 
 export const useMealEntryStore = create<MealEntryState>((set, get) => ({
@@ -63,7 +66,12 @@ export const useMealEntryStore = create<MealEntryState>((set, get) => ({
   },
 
   addEntry: async (input) => {
-    const entry = await createMealEntry({ ...input, userId: MOCK_USER_ID });
+    const userId = getAuthUserId() ?? (isSupabaseConfigured() ? null : MOCK_USER_ID);
+    if (!userId) {
+      throw new Error("User session is not ready.");
+    }
+
+    const entry = await createMealEntry({ ...input, userId });
     const state = get();
     const current = state.byDateId[input.date] ?? [];
     set({
@@ -139,5 +147,9 @@ export const useMealEntryStore = create<MealEntryState>((set, get) => ({
       },
     });
     syncDayLog(dateId);
+  },
+
+  clearCache: () => {
+    set({ byDateId: {}, statusByDateId: {} });
   },
 }));

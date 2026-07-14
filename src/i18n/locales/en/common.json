@@ -161,6 +161,21 @@
       "moderate": "Moderate",
       "active": "Active",
       "very_active": "Very active"
+    },
+    "signIn": {
+      "description": "Sign in to sync your data across devices.",
+      "action": "Sign in"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign in",
+      "subtitle": "Link email to this device",
+      "hint": "After confirming your email, your data stays on this account.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Send link",
+      "checkEmail": "Check {{email}} and confirm your sign-in."
     }
   }
 }

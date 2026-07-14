@@ -1,4 +1,5 @@
 export { useLocaleStore, FALLBACK_LOCALE } from "./slices/useLocaleStore";
+export { useAuthStore, getAuthUserId } from "./slices/useAuthStore";
 export { useCalendarStore } from "./slices/useCalendarStore";
 export { useDayLogStore } from "./slices/useDayLogStore";
 export { useMealEntryStore } from "./slices/useMealEntryStore";

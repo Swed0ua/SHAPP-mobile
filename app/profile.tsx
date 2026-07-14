@@ -10,11 +10,8 @@ import { SettingsSection } from "../src/components/SettingsSection";
 import { SettingsTextField } from "../src/components/SettingsTextField";
 import { StatusPanel } from "../src/components/StatusPanel";
 import { useBottomNavContentInset } from "../src/hooks/useBottomNavContentInset";
-import {
-  useLocaleStore,
-  useUserProfileStore,
-  type ActivityLevel,
-} from "../src/store";
+import { useLocaleStore, useUserProfileStore, useAuthStore, type ActivityLevel } from "../src/store";
+import { PrimaryButton } from "../src/components/PrimaryButton";
 import { useTheme } from "../src/theme";
 import type { ThemePreference } from "../src/theme/types";
 import type { AppLocale } from "../src/i18n";
@@ -52,6 +49,9 @@ export default function ProfileScreen() {
   const profile = useUserProfileStore((state) => state.profile);
   const profileStatus = useUserProfileStore((state) => state.status);
   const updateProfile = useUserProfileStore((state) => state.updateProfile);
+
+  const isSignedIn = useAuthStore((state) => state.isSignedIn);
+  const signIn = useAuthStore((state) => state.signIn);
 
   const locale = useLocaleStore((state) => state.locale);
   const setLocale = useLocaleStore((state) => state.setLocale);
@@ -159,19 +159,33 @@ export default function ProfileScreen() {
       </Text>
 
       <SettingsSection title={t("profile.sections.account")}>
-        <ProfileAvatarPicker
-          imageUri={profile.avatarUrl}
-          label={t("profile.fields.avatar")}
-          changeLabel={t("profile.fields.changeAvatar")}
-          onChange={(uri) => void updateProfile({ avatarUrl: uri })}
-        />
-        <SettingsTextField
-          label={t("profile.fields.displayName")}
-          value={displayName}
-          placeholder={t("profile.fields.displayNamePlaceholder")}
-          onChangeText={setDisplayName}
-          onBlur={saveDisplayName}
-        />
+        {isSignedIn ? (
+          <>
+            <ProfileAvatarPicker
+              imageUri={profile.avatarUrl}
+              label={t("profile.fields.avatar")}
+              changeLabel={t("profile.fields.changeAvatar")}
+              onChange={(uri) => void updateProfile({ avatarUrl: uri })}
+            />
+            <SettingsTextField
+              label={t("profile.fields.displayName")}
+              value={displayName}
+              placeholder={t("profile.fields.displayNamePlaceholder")}
+              onChangeText={setDisplayName}
+              onBlur={saveDisplayName}
+            />
+          </>
+        ) : (
+          <View style={styles.signInBlock}>
+            <Text style={[styles.signInText, { color: theme.colors.content.secondary }]}>
+              {t("profile.signIn.description")}
+            </Text>
+            <PrimaryButton
+              label={t("profile.signIn.action")}
+              onPress={() => void signIn()}
+            />
+          </View>
+        )}
       </SettingsSection>
 
       <SettingsSection title={t("profile.sections.activity")}>
@@ -233,5 +247,13 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "700",
     marginBottom: 4,
+  },
+  signInBlock: {
+    rowGap: 12,
+  },
+  signInText: {
+    fontSize: 14,
+    fontWeight: "500",
+    lineHeight: 20,
   },
 });

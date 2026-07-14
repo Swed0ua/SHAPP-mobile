@@ -60,6 +60,7 @@ export default function RootLayout() {
           <Stack.Screen name="profile" options={{ title: "Profile" }} />
           <Stack.Screen name="calendar" options={{ presentation: "modal" }} />
           <Stack.Screen name="add-food" options={{ presentation: "modal" }} />
+          <Stack.Screen name="auth" options={{ presentation: "modal" }} />
         </Stack>
         <AppBottomNavBar />
         <SuccessOverlayHost />

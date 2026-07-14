@@ -1,5 +1,11 @@
 import { memo } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  type TextInputProps,
+  View,
+} from "react-native";
 
 import { useTheme } from "../../theme";
 
@@ -9,10 +15,22 @@ export interface SettingsTextFieldProps {
   readonly placeholder?: string;
   readonly onChangeText: (text: string) => void;
   readonly onBlur?: () => void;
+  readonly keyboardType?: TextInputProps["keyboardType"];
+  readonly autoCapitalize?: TextInputProps["autoCapitalize"];
+  readonly autoCorrect?: boolean;
 }
 
 export const SettingsTextField = memo<SettingsTextFieldProps>(
-  ({ label, value, placeholder, onChangeText, onBlur }) => {
+  ({
+    label,
+    value,
+    placeholder,
+    onChangeText,
+    onBlur,
+    keyboardType,
+    autoCapitalize,
+    autoCorrect,
+  }) => {
     const { theme } = useTheme();
 
     return (
@@ -37,6 +55,9 @@ export const SettingsTextField = memo<SettingsTextFieldProps>(
             placeholderTextColor={theme.colors.content.tertiary}
             style={[styles.input, { color: theme.colors.content.primary }]}
             selectionColor={theme.colors.accent.default}
+            keyboardType={keyboardType}
+            autoCapitalize={autoCapitalize}
+            autoCorrect={autoCorrect}
           />
         </View>
       </View>

@@ -5,16 +5,23 @@ import {
   getUserProfile,
   updateUserProfile,
 } from "../../services/userProfile";
+import { isSupabaseConfigured } from "../../services/supabase/client";
 import type { LoadStatus } from "../types";
 import type { UserProfile, UserProfilePatch } from "../types/userProfile";
+import { getAuthUserId } from "./useAuthStore";
 
 type UserProfileState = {
   profile: UserProfile | null;
   status: LoadStatus;
   isInitialProfileResolved: boolean;
   resolveInitialProfile: () => Promise<void>;
+  reloadForUser: (userId: string) => Promise<void>;
   updateProfile: (patch: UserProfilePatch) => Promise<void>;
 };
+
+function resolveUserId(): string | null {
+  return getAuthUserId() ?? (isSupabaseConfigured() ? null : MOCK_USER_ID);
+}
 
 export const useUserProfileStore = create<UserProfileState>((set, get) => ({
   profile: null,
@@ -26,10 +33,16 @@ export const useUserProfileStore = create<UserProfileState>((set, get) => ({
       return;
     }
 
+    const userId = resolveUserId();
+    if (!userId) {
+      set({ isInitialProfileResolved: true, status: "idle" });
+      return;
+    }
+
     set({ status: "loading" });
 
     try {
-      const profile = await getUserProfile(MOCK_USER_ID);
+      const profile = await getUserProfile(userId);
       set({
         profile,
         status: "success",
@@ -41,6 +54,22 @@ export const useUserProfileStore = create<UserProfileState>((set, get) => ({
         status: "error",
         isInitialProfileResolved: true,
       });
+    }
+  },
+
+  reloadForUser: async (userId) => {
+    set({ status: "loading", profile: null });
+
+    try {
+      const profile = await getUserProfile(userId);
+      set({
+        profile,
+        status: "success",
+        isInitialProfileResolved: true,
+      });
+    } catch (error) {
+      console.error("Failed to reload user profile:", error);
+      set({ status: "error" });
     }
   },
 
