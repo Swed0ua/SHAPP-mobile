@@ -5,14 +5,16 @@ import { create } from "zustand";
 import { getSupabaseClient, isSupabaseConfigured } from "../../services/supabase/client";
 import { useMealEntryStore } from "./useMealEntryStore";
 
+type AuthResult = { readonly error: string | null };
+
 type AuthState = {
   readonly userId: string | null;
-  /** True when the user linked email / OAuth (not anonymous). */
   readonly isSignedIn: boolean;
   readonly isAuthReady: boolean;
   resolveAuth: () => Promise<void>;
   signIn: () => void;
-  linkEmail: (email: string) => Promise<{ error: string | null }>;
+  requestOtp: (email: string) => Promise<AuthResult>;
+  verifyOtp: (email: string, token: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
 };
 
@@ -31,7 +33,7 @@ let authListenerAttached = false;
 
 async function createGuestSession(
   set: (state: Partial<AuthState>) => void,
-): Promise<string | null> {
+): Promise<void> {
   const supabase = getSupabaseClient();
   await supabase.auth.signOut();
   const { data, error } = await supabase.auth.signInAnonymously();
@@ -39,12 +41,11 @@ async function createGuestSession(
   if (error) {
     console.error("Failed to create guest session:", error);
     applySession(set, null);
-    return null;
+    return;
   }
 
   applySession(set, data.session);
   useMealEntryStore.getState().clearCache();
-  return data.session?.user.id ?? null;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -73,14 +74,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     const { data, error } = await supabase.auth.getSession();
 
-    if (error) {
-      console.error("Failed to restore Supabase session:", error);
-      await createGuestSession(set);
-      set({ isAuthReady: true });
-      return;
-    }
-
-    if (!data.session) {
+    if (error || !data.session) {
+      if (error) {
+        console.error("Failed to restore Supabase session:", error);
+      }
       await createGuestSession(set);
       set({ isAuthReady: true });
       return;
@@ -94,18 +91,41 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     router.push("/auth/sign-in");
   },
 
-  linkEmail: async (email) => {
+  requestOtp: async (email) => {
     if (!isSupabaseConfigured()) {
       return { error: "Supabase is not configured." };
     }
 
-    const supabase = getSupabaseClient();
-    const { error } = await supabase.auth.updateUser({ email });
+    const { error } = await getSupabaseClient().auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true },
+    });
 
     if (error) {
+      console.error("signInWithOtp error:", error);
+    }
+
+    return { error: error?.message ?? null };
+  },
+
+  verifyOtp: async (email, token) => {
+    if (!isSupabaseConfigured()) {
+      return { error: "Supabase is not configured." };
+    }
+
+    const { data, error } = await getSupabaseClient().auth.verifyOtp({
+      email,
+      token,
+      type: "email",
+    });
+
+    if (error) {
+      console.error("verifyOtp error:", error);
       return { error: error.message };
     }
 
+    applySession(set, data.session);
+    useMealEntryStore.getState().clearCache();
     return { error: null };
   },
 

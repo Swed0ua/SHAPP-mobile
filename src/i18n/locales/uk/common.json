@@ -170,12 +170,16 @@
   "auth": {
     "signIn": {
       "title": "Увійти",
-      "subtitle": "Прив'яжіть email до цього пристрою",
-      "hint": "Після підтвердження email ваші дані збережуться в акаунті.",
+      "subtitle": "Вхід за email",
+      "hint": "Введіть email — надішлемо код для входу з будь-якого пристрою.",
       "emailLabel": "Email",
       "emailPlaceholder": "you@example.com",
-      "submit": "Надіслати посилання",
-      "checkEmail": "Перевірте пошту {{email}} і підтвердіть вхід."
+      "submit": "Надіслати код",
+      "otpSubtitle": "Код з листа",
+      "otpHint": "Введіть код, надісланий на {{email}}.",
+      "otpLabel": "Код",
+      "otpPlaceholder": "123456",
+      "verify": "Увійти"
     }
   }
 }

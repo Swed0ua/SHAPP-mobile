@@ -170,12 +170,16 @@
   "auth": {
     "signIn": {
       "title": "Sign in",
-      "subtitle": "Link email to this device",
-      "hint": "After confirming your email, your data stays on this account.",
+      "subtitle": "Sign in with email",
+      "hint": "Enter your email — we'll send a code to sign in on any device.",
       "emailLabel": "Email",
       "emailPlaceholder": "you@example.com",
-      "submit": "Send link",
-      "checkEmail": "Check {{email}} and confirm your sign-in."
+      "submit": "Send code",
+      "otpSubtitle": "Email code",
+      "otpHint": "Enter the code sent to {{email}}.",
+      "otpLabel": "Code",
+      "otpPlaceholder": "123456",
+      "verify": "Sign in"
     }
   }
 }

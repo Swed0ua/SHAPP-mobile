@@ -13,8 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PrimaryButton } from "../../src/components/PrimaryButton";
 import { ScreenHeader } from "../../src/components/ScreenHeader";
 import { SettingsTextField } from "../../src/components/SettingsTextField";
-import { StatusPanel } from "../../src/components/StatusPanel";
-import { useAuthStore } from "../../src/store";
+import { useAuthStore, useUserProfileStore } from "../../src/store";
 import { useTheme } from "../../src/theme";
 
 export default function SignInScreen() {
@@ -22,14 +21,17 @@ export default function SignInScreen() {
   const { t } = useTranslation("common");
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  const linkEmail = useAuthStore((state) => state.linkEmail);
+  const requestOtp = useAuthStore((state) => state.requestOtp);
+  const verifyOtp = useAuthStore((state) => state.verifyOtp);
+  const reloadForUser = useUserProfileStore((state) => state.reloadForUser);
 
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState<"email" | "otp">("email");
   const [error, setError] = useState<string | null>(null);
-  const [isSent, setIsSent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleRequestOtp = async () => {
     const trimmed = email.trim();
     if (!trimmed || isSubmitting) {
       return;
@@ -37,8 +39,7 @@ export default function SignInScreen() {
 
     setIsSubmitting(true);
     setError(null);
-
-    const result = await linkEmail(trimmed);
+    const result = await requestOtp(trimmed);
     setIsSubmitting(false);
 
     if (result.error) {
@@ -46,7 +47,31 @@ export default function SignInScreen() {
       return;
     }
 
-    setIsSent(true);
+    setStep("otp");
+  };
+
+  const handleVerifyOtp = async () => {
+    const trimmedEmail = email.trim();
+    const trimmedOtp = otp.trim();
+    if (!trimmedEmail || !trimmedOtp || isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+    const result = await verifyOtp(trimmedEmail, trimmedOtp);
+    setIsSubmitting(false);
+
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+
+    const userId = useAuthStore.getState().userId;
+    if (userId) {
+      await reloadForUser(userId);
+    }
+    router.back();
   };
 
   return (
@@ -64,40 +89,70 @@ export default function SignInScreen() {
     >
       <ScreenHeader
         title={t("auth.signIn.title")}
-        subtitle={t("auth.signIn.subtitle")}
-        onBack={() => router.back()}
+        subtitle={
+          step === "email"
+            ? t("auth.signIn.subtitle")
+            : t("auth.signIn.otpSubtitle")
+        }
+        onBack={() => {
+          if (step === "otp") {
+            setStep("email");
+            setOtp("");
+            setError(null);
+            return;
+          }
+          router.back();
+        }}
         backAccessibilityLabel={t("foodAdd.close")}
       />
 
       <View style={styles.body}>
-        {isSent ? (
-          <StatusPanel message={t("auth.signIn.checkEmail", { email: email.trim() })} />
+        <Text style={[styles.hint, { color: theme.colors.content.secondary }]}>
+          {step === "email" ? t("auth.signIn.hint") : t("auth.signIn.otpHint", { email })}
+        </Text>
+
+        {step === "email" ? (
+          <SettingsTextField
+            label={t("auth.signIn.emailLabel")}
+            value={email}
+            placeholder={t("auth.signIn.emailPlaceholder")}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
         ) : (
-          <>
-            <Text style={[styles.hint, { color: theme.colors.content.secondary }]}>
-              {t("auth.signIn.hint")}
-            </Text>
-            <SettingsTextField
-              label={t("auth.signIn.emailLabel")}
-              value={email}
-              placeholder={t("auth.signIn.emailPlaceholder")}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            {error ? (
-              <Text style={[styles.error, { color: theme.colors.status.danger }]}>
-                {error}
-              </Text>
-            ) : null}
-            <PrimaryButton
-              label={t("auth.signIn.submit")}
-              disabled={!email.trim() || isSubmitting}
-              onPress={() => void handleSubmit()}
-            />
-          </>
+          <SettingsTextField
+            label={t("auth.signIn.otpLabel")}
+            value={otp}
+            placeholder={t("auth.signIn.otpPlaceholder")}
+            onChangeText={setOtp}
+            keyboardType="number-pad"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
         )}
+
+        {error ? (
+          <Text style={[styles.error, { color: theme.colors.status.danger }]}>
+            {error}
+          </Text>
+        ) : null}
+
+        <PrimaryButton
+          label={
+            step === "email"
+              ? t("auth.signIn.submit")
+              : t("auth.signIn.verify")
+          }
+          disabled={
+            isSubmitting ||
+            (step === "email" ? !email.trim() : !otp.trim())
+          }
+          onPress={() =>
+            void (step === "email" ? handleRequestOtp() : handleVerifyOtp())
+          }
+        />
       </View>
     </KeyboardAvoidingView>
   );
