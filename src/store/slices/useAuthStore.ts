@@ -4,7 +4,6 @@ import { create } from "zustand";
 
 import { getSupabaseClient, isSupabaseConfigured } from "../../services/supabase/client";
 import { useMealEntryStore } from "./useMealEntryStore";
-import { useUserProfileStore } from "./useUserProfileStore";
 
 type AuthState = {
   readonly userId: string | null;
@@ -17,7 +16,10 @@ type AuthState = {
   signOut: () => Promise<void>;
 };
 
-function applySession(set: (state: Partial<AuthState>) => void, session: Session | null) {
+function applySession(
+  set: (state: Partial<AuthState>) => void,
+  session: Session | null,
+) {
   const user = session?.user ?? null;
   set({
     userId: user?.id ?? null,
@@ -26,6 +28,24 @@ function applySession(set: (state: Partial<AuthState>) => void, session: Session
 }
 
 let authListenerAttached = false;
+
+async function createGuestSession(
+  set: (state: Partial<AuthState>) => void,
+): Promise<string | null> {
+  const supabase = getSupabaseClient();
+  await supabase.auth.signOut();
+  const { data, error } = await supabase.auth.signInAnonymously();
+
+  if (error) {
+    console.error("Failed to create guest session:", error);
+    applySession(set, null);
+    return null;
+  }
+
+  applySession(set, data.session);
+  useMealEntryStore.getState().clearCache();
+  return data.session?.user.id ?? null;
+}
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   userId: null,
@@ -45,11 +65,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       supabase.auth.onAuthStateChange((_event, session) => {
         const previousUserId = get().userId;
         applySession(set, session);
-        const nextUserId = session?.user?.id ?? null;
-
-        if (nextUserId && nextUserId !== previousUserId) {
+        if (previousUserId !== session?.user?.id) {
           useMealEntryStore.getState().clearCache();
-          void useUserProfileStore.getState().reloadForUser(nextUserId);
         }
       });
     }
@@ -58,21 +75,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     if (error) {
       console.error("Failed to restore Supabase session:", error);
+      await createGuestSession(set);
       set({ isAuthReady: true });
       return;
     }
 
     if (!data.session) {
-      const { data: guestData, error: guestError } =
-        await supabase.auth.signInAnonymously();
-
-      if (guestError) {
-        console.error("Failed to create guest session:", guestError);
-        set({ isAuthReady: true });
-        return;
-      }
-
-      applySession(set, guestData.session);
+      await createGuestSession(set);
       set({ isAuthReady: true });
       return;
     }
@@ -102,20 +111,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   signOut: async () => {
     if (!isSupabaseConfigured()) {
+      set({ userId: null, isSignedIn: false });
       return;
     }
 
-    const supabase = getSupabaseClient();
-    await supabase.auth.signOut();
-
-    const { error } = await supabase.auth.signInAnonymously();
-    if (error) {
-      console.error("Failed to restore guest session after sign out:", error);
-      return;
-    }
-
-    const { data } = await supabase.auth.getSession();
-    applySession(set, data.session);
+    await createGuestSession(set);
   },
 }));
 

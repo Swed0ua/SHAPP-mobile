@@ -8,7 +8,7 @@ import {
 import { isSupabaseConfigured } from "../../services/supabase/client";
 import type { LoadStatus } from "../types";
 import type { UserProfile, UserProfilePatch } from "../types/userProfile";
-import { getAuthUserId } from "./useAuthStore";
+import { getAuthUserId, useAuthStore } from "./useAuthStore";
 
 type UserProfileState = {
   profile: UserProfile | null;
@@ -21,6 +21,26 @@ type UserProfileState = {
 
 function resolveUserId(): string | null {
   return getAuthUserId() ?? (isSupabaseConfigured() ? null : MOCK_USER_ID);
+}
+
+async function loadProfileOrReset(userId: string): Promise<UserProfile> {
+  try {
+    return await getUserProfile(userId);
+  } catch (error) {
+    console.error("Failed to load user profile:", error);
+
+    if (!isSupabaseConfigured()) {
+      throw error;
+    }
+
+    await useAuthStore.getState().signOut();
+    const nextUserId = getAuthUserId();
+    if (!nextUserId) {
+      throw error;
+    }
+
+    return getUserProfile(nextUserId);
+  }
 }
 
 export const useUserProfileStore = create<UserProfileState>((set, get) => ({
@@ -42,14 +62,14 @@ export const useUserProfileStore = create<UserProfileState>((set, get) => ({
     set({ status: "loading" });
 
     try {
-      const profile = await getUserProfile(userId);
+      const profile = await loadProfileOrReset(userId);
       set({
         profile,
         status: "success",
         isInitialProfileResolved: true,
       });
     } catch (error) {
-      console.error("Failed to load user profile:", error);
+      console.error("Failed to recover user profile:", error);
       set({
         status: "error",
         isInitialProfileResolved: true,
@@ -61,14 +81,14 @@ export const useUserProfileStore = create<UserProfileState>((set, get) => ({
     set({ status: "loading", profile: null });
 
     try {
-      const profile = await getUserProfile(userId);
+      const profile = await loadProfileOrReset(userId);
       set({
         profile,
         status: "success",
         isInitialProfileResolved: true,
       });
     } catch (error) {
-      console.error("Failed to reload user profile:", error);
+      console.error("Failed to recover user profile:", error);
       set({ status: "error" });
     }
   },
