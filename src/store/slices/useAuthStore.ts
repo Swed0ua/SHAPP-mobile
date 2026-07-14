@@ -101,9 +101,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       options: { shouldCreateUser: true },
     });
 
-    if (error) {
-      console.error("signInWithOtp error:", error);
-    }
+    // if (error) {
+    //   console.error("signInWithOtp error:", error);
+    // }
 
     return { error: error?.message ?? null };
   },

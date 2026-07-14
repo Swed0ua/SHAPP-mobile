@@ -173,7 +173,7 @@ export default function FoodPortionScreen() {
 
   useEffect(() => {
     if (loadState === "error" || (params.entryId && !editEntry && loadState === "ready")) {
-      router.back();
+      router.replace("/add-food");
     }
   }, [editEntry, loadState, params.entryId, router]);
 

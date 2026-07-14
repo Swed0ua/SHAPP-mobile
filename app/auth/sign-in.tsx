@@ -71,7 +71,7 @@ export default function SignInScreen() {
     if (userId) {
       await reloadForUser(userId);
     }
-    router.back();
+    router.dismiss();
   };
 
   return (
@@ -101,7 +101,7 @@ export default function SignInScreen() {
             setError(null);
             return;
           }
-          router.back();
+          router.dismiss();
         }}
         backAccessibilityLabel={t("foodAdd.close")}
       />
